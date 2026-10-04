@@ -8,8 +8,11 @@ from backend.app.modules.optimization.compressor import ClientImageCompressor
 from backend.app.modules.optimization.quantizer import ModelQuantizationEngine
 from backend.app.modules.optimization.benchmarks import InferenceBenchmarkSuite
 
-# External APK download URL (set this to GitHub Release asset URL)
-EXTERNAL_APK_URL = os.environ.get("EXTERNAL_APK_URL", "")
+# External APK download URL (points to fast 24/7 GitHub Releases CDN)
+EXTERNAL_APK_URL = os.environ.get(
+    "EXTERNAL_APK_URL",
+    "https://github.com/Ankur-0211/NutriLens-Fit0one/releases/download/v1.0.0/app-debug.apk"
+)
 
 router = APIRouter(tags=["Mobile Optimization & Manifests"])
 
