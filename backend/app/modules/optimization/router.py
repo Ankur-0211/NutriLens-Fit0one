@@ -1,11 +1,15 @@
+import os
 from pathlib import Path
 from fastapi import APIRouter, Query, UploadFile, File, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from typing import Dict, Any
 
 from backend.app.modules.optimization.compressor import ClientImageCompressor
 from backend.app.modules.optimization.quantizer import ModelQuantizationEngine
 from backend.app.modules.optimization.benchmarks import InferenceBenchmarkSuite
+
+# External APK download URL (set this to GitHub Release asset URL)
+EXTERNAL_APK_URL = os.environ.get("EXTERNAL_APK_URL", "")
 
 router = APIRouter(tags=["Mobile Optimization & Manifests"])
 
@@ -91,9 +95,14 @@ def download_mobile_package():
 @router.api_route("/mobile/download-apk", methods=["GET", "HEAD"], summary="Download standalone Android APK installer file")
 def download_android_apk():
     """
-    Downloads the compiled standalone Android APK (nutrilens.apk)
-    which can be shared and installed on any Android device.
+    Downloads the compiled standalone Android APK (nutrilens.apk).
+    If EXTERNAL_APK_URL is set (e.g. GitHub Release), redirects there for
+    reliable large-file downloads. Otherwise serves the local APK file.
     """
+    # Prefer external CDN (GitHub Releases) for reliable large file downloads
+    if EXTERNAL_APK_URL:
+        return RedirectResponse(url=EXTERNAL_APK_URL, status_code=302)
+
     possible_paths = [
         Path("backend/uploads/nutrilens.apk").resolve(),
         Path(__file__).resolve().parent.parent.parent.parent / "uploads" / "nutrilens.apk",
@@ -107,6 +116,7 @@ def download_android_apk():
                 filename="nutrilens.apk",
                 media_type="application/vnd.android.package-archive",
             )
-    raise HTTPException(status_code=404, detail="Android APK package not found")
+    raise HTTPException(status_code=404, detail="Android APK package not found. Set EXTERNAL_APK_URL environment variable for cloud deployments.")
+
 
 
