@@ -108,8 +108,11 @@ def test_mobile_download_endpoints():
     assert res_zip.headers.get("content-type") == "application/zip"
     assert int(res_zip.headers.get("content-length", 0)) > 1000000
 
-    # Test Mobile Standalone APK Download
-    res_apk = client.get("/v1/mobile/download-apk")
-    assert res_apk.status_code == 200
-    assert "application/vnd.android.package-archive" in res_apk.headers.get("content-type", "")
-    assert int(res_apk.headers.get("content-length", 0)) > 10000000
+    # Test Mobile Standalone APK Download (supports 302 redirect to cloud CDN or 200 local file)
+    res_apk = client.get("/v1/mobile/download-apk", follow_redirects=False)
+    assert res_apk.status_code in (200, 302)
+    if res_apk.status_code == 302:
+        assert "releases/download" in res_apk.headers.get("location", "")
+    else:
+        assert "application/vnd.android.package-archive" in res_apk.headers.get("content-type", "")
+        assert int(res_apk.headers.get("content-length", 0)) > 10000000
