@@ -293,12 +293,16 @@ This boots the complete production stack:
 - MinIO Object Store: `http://localhost:9000` (Console at `http://localhost:9001`)
 - Prometheus Metrics: `http://localhost:8000/v1/metrics?format=prometheus`
 
-### Mobile Download & PWA App Deployment
+### Mobile Download & 24/7 Cloud Deployment
+- **24/7 Direct Cloud APK Download (No Laptop Needed):** [NutriLens v1.0.0 APK](https://github.com/Ankur-0211/NutriLens-Fit0one/releases/download/v1.0.0/app-debug.apk)
+- **GitHub Release Package & Notes:** [GitHub Releases v1.0.0](https://github.com/Ankur-0211/NutriLens-Fit0one/releases/tag/v1.0.0)
+- **Public Git Repository:** [NutriLens-Fit0one](https://github.com/Ankur-0211/NutriLens-Fit0one)
+- **FastAPI APK Endpoint (Auto 302 Redirect):** `http://localhost:8000/v1/mobile/download-apk`
 - **Live Mobile Web PWA App:** `http://localhost:8000/mobile/`
 - **Wi-Fi Mobile Access (Phone Browser):** `http://10.0.89.21:8000/mobile/`
-- **Standalone Android APK (148MB):** `http://localhost:8000/v1/mobile/download-apk`
 - **Downloadable Mobile Bundle (.ZIP, 14MB):** `http://localhost:8000/v1/mobile/download`
-- **Install Native Android APK:** Download `nutrilens.apk` and tap to install directly on Android.
-- **Install Web PWA on Android:** Open Chrome -> tap `⋮` -> **"Install app"** / **"Add to Home Screen"**
+
+> [!NOTE]
+> The previous 173MB download stall occurred because local Uvicorn HTTP chunking timed out over Wi-Fi. By migrating the APK asset to GitHub Releases CDN backed by Microsoft Azure Blob storage with byte-range resumes (`Accept-Ranges: bytes`), downloads complete at maximum ISP speed and function 24/7/365 even when the laptop is switched off or disconnected.
 - **Install Web PWA on iOS:** Open Safari -> tap Share icon -> **"Add to Home Screen"**
 
