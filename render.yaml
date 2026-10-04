@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: nutrilens-api
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        value: sqlite:///nutrilens.db
+      - key: SECRET_KEY
+        generateValue: true

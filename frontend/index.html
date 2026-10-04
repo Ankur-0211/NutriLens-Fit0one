@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>NutriLens // Cyber-Kinetic Indian Food Nutrition Tracker</title>
+  
+  <!-- Material Symbols & Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS & Cyber-Kinetic Token Config (Exact DESIGN.md specs) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#101319",
+            "surface-dim": "#101319",
+            "surface-bright": "#363940",
+            "surface-container-lowest": "#0b0e14",
+            "surface-container-low": "#191c22",
+            "surface-container": "#1d2026",
+            "surface-container-high": "#272a30",
+            "surface-container-highest": "#32353b",
+            "on-surface": "#e1e2eb",
+            "on-surface-variant": "#b9cbb9",
+            "inverse-surface": "#e1e2eb",
+            "inverse-on-surface": "#2d3037",
+            "outline": "#849585",
+            "outline-variant": "#3b4b3d",
+            "surface-tint": "#00e479",
+            "primary": "#f1ffef",
+            "on-primary": "#003919",
+            "primary-container": "#00ff88",
+            "on-primary-container": "#007139",
+            "inverse-primary": "#006d37",
+            "secondary": "#ffb68e",
+            "on-secondary": "#542200",
+            "secondary-container": "#eb6b01",
+            "on-secondary-container": "#491d00",
+            "tertiary": "#fffaf9",
+            "on-tertiary": "#680017",
+            "tertiary-container": "#ffd4d4",
+            "on-tertiary-container": "#c50034",
+            "error": "#ffb4ab",
+            "on-error": "#690005",
+            "error-container": "#93000a",
+            "on-error-container": "#ffdad6",
+            "primary-fixed": "#60ff99",
+            "primary-fixed-dim": "#00e479",
+            "on-primary-fixed": "#00210c",
+            "on-primary-fixed-variant": "#005228",
+            "secondary-fixed": "#ffdbca",
+            "secondary-fixed-dim": "#ffb68e",
+            "on-secondary-fixed": "#331200",
+            "on-secondary-fixed-variant": "#773300",
+            "tertiary-fixed": "#ffdada",
+            "tertiary-fixed-dim": "#ffb3b4",
+            "on-tertiary-fixed": "#40000b",
+            "on-tertiary-fixed-variant": "#920024",
+            "background": "#101319",
+            "on-background": "#e1e2eb",
+            "surface-variant": "#32353b"
+          },
+          fontFamily: {
+            "headline-lg": ["Space Grotesk", "sans-serif"],
+            "headline-sm": ["Space Grotesk", "sans-serif"],
+            "body-sm": ["Geist", "sans-serif"],
+            "label-sm": ["JetBrains Mono", "monospace"],
+            "display-lg": ["Space Grotesk", "sans-serif"],
+            "label-md": ["JetBrains Mono", "monospace"],
+            "label-lg": ["JetBrains Mono", "monospace"],
+            "headline-xl-mobile": ["Space Grotesk", "sans-serif"],
+            "body-md": ["Geist", "sans-serif"],
+            "body-lg": ["Geist", "sans-serif"],
+            "headline-xl": ["Space Grotesk", "sans-serif"],
+            "display-lg-mobile": ["Space Grotesk", "sans-serif"]
+          },
+          spacing: {
+            "space-2xs": "0.25rem",
+            "gutter-desktop": "1.5rem",
+            "space-xs": "0.5rem",
+            "gutter": "1rem",
+            "margin": "1rem",
+            "space-lg": "1.5rem",
+            "margin-desktop": "3rem",
+            "space-xl": "2rem",
+            "space-sm": "0.75rem",
+            "margin-tablet": "2rem",
+            "space-2xl": "3rem",
+            "space-md": "1rem"
+          }
+        }
+      }
+    };
+  </script>
+  
+  <style>
+    @layer base {
+      html, body { width: 100vw; margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+    }
+    ::-webkit-scrollbar { display: none; }
+    .scan-laser-anim {
+      animation: scanLaser 2.2s ease-in-out infinite alternate;
+    }
+    @keyframes scanLaser {
+      0% { top: 10%; opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { top: 88%; opacity: 0.8; }
+    }
+  </style>
+</head>
+
+<body class="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen selection:bg-primary-container selection:text-on-primary">
+  
+  <!-- Universal Top Header -->
+  <header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)] pt-safe">
+    <div class="h-16 px-gutter flex items-center justify-between max-w-2xl mx-auto">
+      <div class="flex items-center gap-space-sm cursor-pointer" onclick="switchTab('dashboard')">
+        <!-- Brand Mark -->
+        <div class="w-8 h-8 rounded-lg bg-primary-container/20 border border-primary-container/40 flex items-center justify-center text-primary-container">
+          <span class="material-symbols-outlined text-xl">grain</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-space-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>
+            <span class="font-headline-sm text-headline-sm tracking-tight text-on-surface uppercase" id="header-title">DASHBOARD</span>
+          </div>
+          <span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">NUTRILENS // BIO-TELEMETRY</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-space-xs">
+        <button aria-label="Mobile App Download" class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary-container transition-colors" onclick="openMobileAppModal()" title="Download & Install Mobile App">
+          <span class="material-symbols-outlined text-lg">smartphone</span>
+        </button>
+        <button aria-label="Model Improvement Ops" class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary-container transition-colors" onclick="openModelOpsModal()" title="Phase 9 Model Ops & Feedback Pipeline">
+          <span class="material-symbols-outlined text-lg">tune</span>
+        </button>
+        <button aria-label="Live Sensor Health" class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary-container transition-colors" onclick="checkHealth()">
+          <span class="material-symbols-outlined text-lg" id="radar-icon">radar</span>
+        </button>
+        <div class="relative flex items-center justify-center p-0.5 rounded-full bg-surface-container-high cursor-pointer" onclick="openProfileModal()">
+          <div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-primary-container font-label-sm font-bold">
+            KA
+          </div>
+          <span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-primary-container"></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Container -->
+  <main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface max-w-2xl mx-auto">
+    
+    <!-- ========================================== -->
+    <!-- VIEW 1: DASHBOARD (Calorie Telemetry)      -->
+    <!-- ========================================== -->
+    <section id="view-dashboard" class="view-panel flex flex-col w-full px-gutter space-y-space-md text-on-surface pt-2">
+      <!-- Biometric HUD Status Strip -->
+      <div class="flex items-center justify-between p-space-sm rounded-xl bg-surface-container-low shadow-sm">
+        <div class="flex items-center gap-space-xs">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-container opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-primary-container"></span>
+          </span>
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary-fixed-dim">BIO-SYNC ACTIVE</span>
+          <span class="font-label-sm text-label-sm text-outline">|</span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant font-mono">SYS.77.2HZ</span>
+        </div>
+        <div class="flex items-center gap-space-xs bg-surface-container px-space-xs py-0.5 rounded-full">
+          <span class="material-symbols-outlined text-sm text-secondary-fixed-dim">local_fire_department</span>
+          <span class="font-label-sm text-label-sm text-on-surface font-semibold">TDEE 2,500</span>
+        </div>
+      </div>
+
+      <!-- Quick Access Command Row -->
+      <div class="grid grid-cols-3 gap-space-xs">
+        <button onclick="switchTab('quick-log')" class="flex flex-col items-center justify-center p-space-sm bg-primary-container text-on-primary rounded-xl shadow-[0_0_16px_rgba(0,255,136,0.25)] hover:bg-primary-fixed-dim transition-all active:scale-95">
+          <span class="material-symbols-outlined text-xl mb-0.5">center_focus_strong</span>
+          <span class="font-label-sm text-label-sm tracking-widest uppercase font-bold">SCAN FOOD</span>
+        </button>
+        <button onclick="switchTab('meals-diary')" class="flex flex-col items-center justify-center p-space-sm bg-surface-container-high text-on-surface rounded-xl hover:bg-surface-bright transition-all active:scale-95 shadow-sm">
+          <span class="material-symbols-outlined text-xl mb-0.5 text-secondary-fixed-dim">dataset</span>
+          <span class="font-label-sm text-label-sm tracking-widest uppercase">LOG DIARY</span>
+        </button>
+        <button onclick="openManualFoodModal()" class="flex flex-col items-center justify-center p-space-sm bg-surface-container-high text-on-surface rounded-xl hover:bg-surface-bright transition-all active:scale-95 shadow-sm">
+          <span class="material-symbols-outlined text-xl mb-0.5 text-primary-fixed-dim">search</span>
+          <span class="font-label-sm text-label-sm tracking-widest uppercase">SEARCH</span>
+        </button>
+      </div>
+
+      <!-- Caloric Flux Circular HUD Telemetry Meter -->
+      <div class="p-space-md rounded-xl bg-surface-container-low shadow-md relative overflow-hidden">
+        <div class="flex items-center justify-between mb-space-xs">
+          <div class="flex items-center gap-space-xs">
+            <span class="material-symbols-outlined text-base text-primary-container">thermostat</span>
+            <span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">CALORIC FLUX DYNAMICS</span>
+          </div>
+          <span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container text-primary-fixed-dim font-bold" id="flux-status">NOMINAL</span>
+        </div>
+
+        <!-- Dual Arc Gauge SVG Visual -->
+        <div class="relative flex flex-col items-center justify-center my-space-xs">
+          <svg class="w-56 h-56 transform -rotate-90" viewBox="0 0 200 200">
+            <defs>
+              <linearGradient id="calFluxGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+                <stop offset="0%" stop-color="#ff3366"></stop>
+                <stop offset="45%" stop-color="#ff7a1a"></stop>
+                <stop offset="100%" stop-color="#00ff88"></stop>
+              </linearGradient>
+              <linearGradient id="trackGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+                <stop offset="0%" stop-color="#272a30"></stop>
+                <stop offset="100%" stop-color="#1d2026"></stop>
+              </linearGradient>
+            </defs>
+            <circle cx="100" cy="100" fill="none" r="82" stroke="url(#trackGradient)" stroke-dasharray="4 2" stroke-width="12"></circle>
+            <circle id="gauge-arc" cx="100" cy="100" fill="none" r="82" stroke="url(#calFluxGradient)" stroke-dasharray="515" stroke-dashoffset="290" stroke-linecap="round" stroke-width="12" class="transition-all duration-700"></circle>
+            <circle cx="100" cy="100" fill="none" opacity="0.6" r="68" stroke="#272a30" stroke-dasharray="6 4" stroke-width="1.5"></circle>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <span class="font-label-sm text-label-sm uppercase tracking-widest text-outline">RESERVE CAP</span>
+            <span class="font-headline-xl-mobile text-headline-xl-mobile text-primary tracking-tight font-bold" id="cal-remaining">1,420</span>
+            <span class="font-label-md text-label-md text-primary-container uppercase font-semibold">KCAL REMAINING</span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant font-mono mt-0.5" id="cal-budget-percent">56.8% BUDGET LEFT</span>
+          </div>
+        </div>
+
+        <!-- HUD Caloric Flux Decomposition -->
+        <div class="grid grid-cols-3 gap-space-2xs pt-space-xs bg-surface-container rounded-lg p-space-xs text-center">
+          <div class="flex flex-col">
+            <span class="font-label-sm text-label-sm text-outline">BASE ALLOC</span>
+            <span class="font-label-lg text-label-lg font-bold text-on-surface" id="base-alloc-val">2,150</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-label-sm text-label-sm text-on-tertiary-container">INTAKE</span>
+            <span class="font-label-lg text-label-lg font-bold text-error" id="intake-val">-1,080</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-label-sm text-label-sm text-primary-fixed-dim">EXPENDED</span>
+            <span class="font-label-lg text-label-lg font-bold text-primary-container">+350</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Macro Spectrum Telemetry (Red, Orange, Green Gauges) -->
+      <div class="p-space-md rounded-xl bg-surface-container-low shadow-sm space-y-space-sm">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-space-xs">
+            <span class="material-symbols-outlined text-base text-secondary-container">bar_chart</span>
+            <span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">MACRO STRATA TELEMETRY</span>
+          </div>
+          <span class="font-label-sm text-label-sm text-outline uppercase font-mono">TARGET 100%</span>
+        </div>
+
+        <!-- Macro 1: Protein -->
+        <div class="space-y-1">
+          <div class="flex justify-between items-baseline font-label-md text-label-md">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-error"></span>
+              <span class="font-semibold text-on-surface">PROTEIN // NITROGEN</span>
+            </div>
+            <span class="font-mono text-body-sm text-error font-bold" id="protein-stat">112g <span class="text-outline">/ 145g</span> (77%)</span>
+          </div>
+          <div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden p-0.5">
+            <div id="protein-bar" class="h-full rounded-full bg-gradient-to-r from-error to-on-tertiary-container shadow-[0_0_8px_rgba(255,51,102,0.4)] transition-all duration-500" style="width: 77%"></div>
+          </div>
+        </div>
+
+        <!-- Macro 2: Carbs -->
+        <div class="space-y-1">
+          <div class="flex justify-between items-baseline font-label-md text-label-md">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+              <span class="font-semibold text-on-surface">CARBS // GLYCOGEN LOAD</span>
+            </div>
+            <span class="font-mono text-body-sm text-secondary-fixed-dim font-bold" id="carbs-stat">140g <span class="text-outline">/ 220g</span> (64%)</span>
+          </div>
+          <div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden p-0.5">
+            <div id="carbs-bar" class="h-full rounded-full bg-secondary-container shadow-[0_0_8px_rgba(235,107,1,0.35)] transition-all duration-500" style="width: 64%"></div>
+          </div>
+        </div>
+
+        <!-- Macro 3: Fat -->
+        <div class="space-y-1">
+          <div class="flex justify-between items-baseline font-label-md text-label-md">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-primary-container"></span>
+              <span class="font-semibold text-on-surface">LIPIDS // CELLULAR INTEGRITY</span>
+            </div>
+            <span class="font-mono text-body-sm text-primary-container font-bold" id="fat-stat">42g <span class="text-outline">/ 65g</span> (65%)</span>
+          </div>
+          <div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden p-0.5">
+            <div id="fat-bar" class="h-full rounded-full bg-primary-container shadow-[0_0_8px_rgba(0,255,136,0.35)] transition-all duration-500" style="width: 65%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chrono Fuel Feed / Today's Meals -->
+      <div class="p-space-md rounded-xl bg-surface-container-low shadow-sm space-y-space-sm">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-space-xs">
+            <span class="material-symbols-outlined text-base text-outline">schedule</span>
+            <span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">CHRONO FUEL FEED</span>
+          </div>
+          <span class="font-label-sm text-label-sm text-outline uppercase font-mono cursor-pointer hover:text-primary-container" onclick="switchTab('meals-diary')">VIEW ALL &rarr;</span>
+        </div>
+        <div id="dashboard-meals-container" class="space-y-space-xs">
+          <!-- Dynamically populated from API -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VIEW 2: QUICK FOOD LOG SCANNER (HUD)       -->
+    <!-- ========================================== -->
+    <section id="view-quick-log" class="view-panel hidden flex flex-col w-full px-margin gap-space-md text-on-surface pt-2">
+      <!-- Universal Search Bar -->
+      <div class="w-full relative">
+        <div class="w-full flex items-center bg-surface-container-low rounded-xl px-space-md py-space-sm gap-space-sm shadow-md">
+          <span class="material-symbols-outlined text-primary-container text-xl select-none">search</span>
+          <input id="food-search-input" class="w-full bg-transparent font-label-md text-label-md text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none tracking-wider uppercase min-w-0" placeholder="SEARCH INDIAN FOODS, ROTI, DAL..." type="text"/>
+          <button onclick="clearSearch()" class="text-on-surface-variant hover:text-on-surface text-sm hidden" id="clear-search-btn">
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </div>
+        <!-- Live Search Dropdown -->
+        <div id="search-results-dropdown" class="absolute top-14 inset-x-0 bg-surface-container-high rounded-xl p-space-xs shadow-2xl z-40 border border-surface-container-highest hidden max-h-72 overflow-y-auto space-y-1"></div>
+      </div>
+
+      <!-- Viewfinder Camera HUD -->
+      <div class="w-full bg-surface-container-low rounded-xl p-space-sm flex flex-col gap-space-sm relative overflow-hidden shadow-xl">
+        <!-- HUD Header Status -->
+        <div class="flex items-center justify-between px-space-xs pt-space-2xs">
+          <div class="flex items-center gap-space-xs">
+            <span class="w-2 h-2 rounded-full bg-primary-container animate-ping"></span>
+            <span class="font-label-sm text-label-sm text-primary-container tracking-widest font-semibold uppercase">OPTICAL SENSOR // ACTIVE</span>
+          </div>
+          <div class="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded-full">
+            <span class="material-symbols-outlined text-xs text-primary-container">auto_awesome</span>
+            <span class="font-label-sm text-label-sm text-primary tracking-wider uppercase">AI 4.2 RECOGNITION</span>
+          </div>
+        </div>
+
+        <!-- Camera Viewport Box -->
+        <div class="relative w-full h-64 bg-surface-container-lowest rounded-lg overflow-hidden flex items-center justify-center border border-surface-container">
+          <!-- Image preview or synthetic meal background -->
+          <div id="camera-feed" class="absolute inset-0 bg-cover bg-center transition-all duration-300" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCiJw3v2J0-0XzJnaFnZvfxLKjZW3IAfmxvTAciX6tRfSVpH_wCkymhm_7L9y9t3hab8i7pXncQcsvbvJeFiVm4VAZYq8x1iIjEASh_rhgyQZ_YupK6ZFUGYlFOMzzP6AlDXAMxpQtxD2pWogkGAw7jEazP0crI_Us-c15dMLUVcRiCD7Adky3uCF68eIInDBu7wbNyms2mJcsRKsMEH7PdBw63USxaDi3BsCCoeIOTlUvQGUeQZVFT');">
+          </div>
+          <!-- Cyber Grid Overlay -->
+          <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none"></div>
+          <!-- Scanning Laser Line (Animated) -->
+          <div id="laser-line" class="absolute inset-x-4 h-0.5 bg-gradient-to-r from-transparent via-primary-container to-transparent shadow-[0_0_12px_#00ff88] scan-laser-anim pointer-events-none"></div>
+
+          <!-- Bounding Boxes Layer -->
+          <div id="bounding-boxes-layer" class="absolute inset-0 pointer-events-none"></div>
+
+          <!-- HUD Reticle Brackets -->
+          <div id="hud-reticle" class="relative z-10 w-48 h-36 flex flex-col justify-between p-1 pointer-events-none">
+            <div class="flex justify-between items-start">
+              <div class="w-4 h-4 border-t-2 border-l-2 border-primary-container shadow-[0_0_8px_#00ff88]"></div>
+              <div class="w-4 h-4 border-t-2 border-r-2 border-secondary-container shadow-[0_0_8px_#eb6b01]"></div>
+            </div>
+            <div class="flex flex-col items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-primary-container text-2xl animate-pulse">filter_center_focus</span>
+              <span class="font-label-sm text-label-sm text-on-surface bg-surface-container-high/90 px-2 py-0.5 rounded tracking-widest text-[9px] uppercase">ALIGN FOOD ITEM / THALI</span>
+            </div>
+            <div class="flex justify-between items-end">
+              <div class="w-4 h-4 border-b-2 border-l-2 border-secondary-container shadow-[0_0_8px_#eb6b01]"></div>
+              <div class="w-4 h-4 border-b-2 border-r-2 border-primary-container shadow-[0_0_8px_#00ff88]"></div>
+            </div>
+          </div>
+
+          <!-- Telemetry Watermarks -->
+          <div class="absolute bottom-2 left-3 font-label-sm text-[10px] text-on-surface-variant/70 tracking-widest uppercase">
+            X:45.09 // Y:12.78 // FPS:60
+          </div>
+          <div class="absolute top-2 right-3 font-label-sm text-[10px] text-primary-container tracking-widest uppercase">
+            AUTOFOCUS: LOCKED
+          </div>
+        </div>
+
+        <!-- Hidden file input for gallery/camera upload -->
+        <input type="file" id="camera-file-input" accept="image/*" class="hidden" onchange="handleImageSelected(event)" />
+
+        <!-- Scanner Action Buttons -->
+        <div class="grid grid-cols-2 gap-space-xs">
+          <button onclick="document.getElementById('camera-file-input').click()" class="py-space-sm bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-md text-label-md font-bold tracking-widest uppercase rounded-lg flex items-center justify-center gap-2 active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-lg text-primary-container">photo_library</span>
+            <span>CHOOSE PHOTO</span>
+          </button>
+          <button id="instant-capture-btn" onclick="triggerAnalyze()" class="py-space-sm bg-primary-container active:scale-[0.98] text-on-primary font-label-md text-label-md font-bold tracking-widest uppercase rounded-lg flex items-center justify-center gap-2 shadow-[0_0_16px_rgba(0,255,136,0.35)] hover:bg-primary-fixed-dim transition-all">
+            <span class="material-symbols-outlined text-lg">bolt</span>
+            <span>⚡ SCAN MEAL</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- AI Detection Results Container -->
+      <div id="scan-results-container" class="w-full flex flex-col gap-space-sm hidden">
+        <div class="flex items-center justify-between px-space-xs">
+          <div class="flex items-center gap-space-xs">
+            <span class="material-symbols-outlined text-primary-container text-base">verified</span>
+            <span class="font-headline-sm text-headline-sm text-primary uppercase">DETECTED SPECIMENS</span>
+          </div>
+          <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest" id="detected-count">4 ITEMS</span>
+        </div>
+        <div id="scan-detected-items" class="flex flex-col gap-space-xs">
+          <!-- Populated from POST /food/analyze -->
+        </div>
+
+        <button onclick="commitScanToDiary()" class="w-full py-3.5 bg-primary-container hover:bg-primary-fixed-dim text-on-primary font-label-lg text-label-lg font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,255,136,0.35)] active:scale-[0.98] transition-all mt-2">
+          <span class="material-symbols-outlined text-xl">done_all</span>
+          <span>SAVE ALL TO DIARY</span>
+        </button>
+      </div>
+
+      <!-- Rapid Calorie Injector -->
+      <div class="w-full bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-md shadow-md">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-space-xs">
+            <span class="material-symbols-outlined text-primary-container text-lg">cyclone</span>
+            <span class="font-headline-sm text-headline-sm text-primary uppercase">RAPID INJECTOR</span>
+          </div>
+          <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">MANUAL DELTA</span>
+        </div>
+        <div class="bg-surface-container-lowest rounded-lg p-space-md flex items-baseline justify-between shadow-inner">
+          <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">METABOLIC PAYLOAD</span>
+          <div class="flex items-baseline gap-1">
+            <span class="font-display-lg-mobile text-display-lg-mobile text-tertiary tracking-tight font-bold" id="calorie-display">250</span>
+            <span class="font-label-md text-label-md text-primary-container font-semibold uppercase">KCAL</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-space-xs">
+          <button onclick="adjustInjector(-50)" class="bg-surface-container-highest active:scale-95 py-2.5 rounded-lg flex items-center justify-center gap-1 font-label-md text-label-md text-on-surface hover:text-white transition-all">
+            <span class="material-symbols-outlined text-base">remove</span> 50 KCAL
+          </button>
+          <button onclick="adjustInjector(50)" class="bg-surface-container-high text-secondary-fixed active:scale-95 py-2.5 rounded-lg flex items-center justify-center gap-1 font-label-md text-label-md font-semibold hover:bg-secondary-container hover:text-on-secondary-container transition-all">
+            <span class="material-symbols-outlined text-base">add</span> 50 KCAL
+          </button>
+          <button onclick="adjustInjector(100)" class="bg-surface-container-high text-primary-container active:scale-95 py-2.5 rounded-lg flex items-center justify-center gap-1 font-label-md text-label-md font-bold hover:bg-primary-container hover:text-on-primary transition-all">
+            <span class="material-symbols-outlined text-base">add</span> 100 KCAL
+          </button>
+        </div>
+        <div class="flex flex-col gap-space-2xs">
+          <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">MEAL CHRONO PHASE</span>
+          <div class="grid grid-cols-4 gap-space-xs pt-1">
+            <button onclick="selectMealPhase('breakfast', this)" class="meal-phase-btn bg-surface-container-highest text-on-surface py-2 rounded-lg font-label-sm text-label-sm uppercase tracking-wider transition-colors active:scale-95">BRK</button>
+            <button onclick="selectMealPhase('lunch', this)" class="meal-phase-btn bg-primary-container text-on-primary font-bold py-2 rounded-lg font-label-sm text-label-sm uppercase tracking-wider transition-colors active:scale-95 shadow-[0_0_8px_rgba(0,255,136,0.3)]">LUN</button>
+            <button onclick="selectMealPhase('dinner', this)" class="meal-phase-btn bg-surface-container-highest text-on-surface py-2 rounded-lg font-label-sm text-label-sm uppercase tracking-wider transition-colors active:scale-95">DIN</button>
+            <button onclick="selectMealPhase('snack', this)" class="meal-phase-btn bg-surface-container-highest text-on-surface py-2 rounded-lg font-label-sm text-label-sm uppercase tracking-wider transition-colors active:scale-95">SNK</button>
+          </div>
+        </div>
+        <button onclick="commitQuickInjector()" class="w-full py-3.5 bg-primary-container hover:bg-primary-fixed-dim text-on-primary font-label-lg text-label-lg font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,255,136,0.35)] active:scale-[0.98] transition-all">
+          <span class="material-symbols-outlined text-xl">add_circle</span>
+          <span>+ COMMIT TO DAILY TELEMETRY</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VIEW 3: FOOD DETAIL MACRO CALIBRATION      -->
+    <!-- ========================================== -->
+    <section id="view-food-detail" class="view-panel hidden flex flex-col w-full text-on-surface">
+      <!-- Specimen Presentation Header -->
+      <div class="relative w-full overflow-hidden bg-surface-container-lowest">
+        <div class="relative w-full h-72">
+          <img id="detail-img" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh_Wq5G55P8xwFxKy0GyGyv_p9gLLxh-JMOZPMRPcjdV4ip6GUwHVyVTwef-MzpTUs3Phl1nZh0eZyXGcv6NzNKKnRYfFYpIQdjD8Vcv5EHVR0BpZf5afa1vAYNAJ24zBerwKTbDOC5lHr-1wTvE4y4Kuv58Kx1ropVs01vEJ0IDWV8Br_k1CZSZYsjGJ5hFXCds0R9lVazNh-ZAXERR8oAj8DLXOook_CbePWomEQI5op627qRf7_"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent"></div>
+          
+          <div class="absolute top-4 left-4 right-4 flex items-center justify-between">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md text-primary-container font-label-sm text-label-sm tracking-wider uppercase shadow-md">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>
+              <span id="detail-specimen-id">SPECIMEN // 884-IND</span>
+            </span>
+            <button onclick="closeDetail()" class="w-8 h-8 rounded-full bg-surface-container-high/90 backdrop-blur-md flex items-center justify-center text-on-surface hover:text-primary-container transition-colors">
+              <span class="material-symbols-outlined text-base">close</span>
+            </button>
+          </div>
+          
+          <div class="absolute bottom-4 left-4 right-4">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-primary-container/20 text-primary-container font-label-sm text-label-sm uppercase" id="detail-category-badge">
+                CURRY & GRAVY
+              </span>
+              <span class="font-label-sm text-label-sm text-on-surface-variant" id="detail-provenance">IFCT 2017 ANALYTICAL</span>
+            </div>
+            <h2 class="font-headline-lg text-headline-lg tracking-tight text-tertiary" id="detail-title">Paneer Butter Masala</h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5" id="detail-desc">Rich cottage cheese cubes simmered in spiced tomato and butter gravy</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-margin flex flex-col gap-space-md mt-space-sm">
+        <!-- Calorie Hero HUD Panel -->
+        <div class="rounded-xl bg-surface-container-low p-space-md shadow-md flex flex-col gap-space-sm">
+          <div class="flex items-baseline justify-between">
+            <div class="flex flex-col">
+              <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total Metabolic Energy</span>
+              <div class="flex items-baseline gap-1.5 mt-0.5">
+                <span class="font-display-lg-mobile text-display-lg-mobile font-bold text-tertiary leading-none" id="detail-cal-display">365</span>
+                <span class="font-label-md text-label-md text-primary-container uppercase">KCAL</span>
+              </div>
+            </div>
+            <div class="flex flex-col items-end">
+              <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Daily Quota Shift</span>
+              <span class="font-headline-sm text-headline-sm text-primary-container font-semibold mt-0.5" id="detail-quota-percent">17.0%</span>
+              <span class="font-label-sm text-label-sm text-on-surface-variant">OF 2,150 TARGET</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Portion & Serving Calibration Slider -->
+        <div class="rounded-xl bg-surface-container-low p-space-md shadow-sm space-y-space-sm">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-space-xs">
+              <span class="material-symbols-outlined text-primary-container text-base">scale</span>
+              <span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">PORTION CALIBRATION</span>
+            </div>
+            <span class="font-label-sm text-label-sm font-mono text-primary-fixed-dim font-bold" id="detail-grams-label">150 GRAMS</span>
+          </div>
+
+          <!-- Unit Selector Chips -->
+          <div class="flex gap-2 overflow-x-auto py-1" id="detail-units-container">
+            <!-- Dynamically populated -->
+          </div>
+
+          <!-- Interactive Slider -->
+          <div class="pt-2">
+            <input type="range" id="portion-slider" min="20" max="500" step="5" value="150" class="w-full accent-primary-container h-2 bg-surface-container-high rounded-lg cursor-pointer" oninput="handleSliderChange(this.value)" />
+            <div class="flex justify-between text-outline text-[11px] font-mono mt-1">
+              <span>20g</span>
+              <span>150g (1 Katori)</span>
+              <span>300g (Bowl)</span>
+              <span>500g</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recipe & Preparation Variant Switcher (FR-C9) -->
+        <div class="rounded-xl bg-surface-container-low p-space-md shadow-sm space-y-space-sm">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-space-xs">
+              <span class="material-symbols-outlined text-secondary-container text-base">soup_kitchen</span>
+              <span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">PREPARATION VARIANT</span>
+            </div>
+            <span class="font-label-sm text-label-sm text-primary-container uppercase font-mono">UNCERTAINTY EXPOSED</span>
+          </div>
+          <div class="grid grid-cols-2 gap-space-xs" id="detail-variants-container">
+            <!-- Dynamically populated with variant buttons -->
+          </div>
+        </div>
+
+        <!-- Macro Breakdown Gauges -->
+        <div class="rounded-xl bg-surface-container-low p-space-md shadow-sm space-y-space-sm">
+          <span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">SPECIMEN MACRONUTRIENTS</span>
+          <div class="grid grid-cols-3 gap-2 text-center pt-1">
+            <div class="p-space-xs bg-surface-container rounded-lg">
+              <span class="font-label-sm text-outline">PROTEIN</span>
+              <div class="font-headline-sm text-error font-bold" id="detail-macro-protein">13.5g</div>
+            </div>
+            <div class="p-space-xs bg-surface-container rounded-lg">
+              <span class="font-label-sm text-outline">CARBS</span>
+              <div class="font-headline-sm text-secondary font-bold" id="detail-macro-carbs">11.8g</div>
+            </div>
+            <div class="p-space-xs bg-surface-container rounded-lg">
+              <span class="font-label-sm text-outline">LIPIDS (FAT)</span>
+              <div class="font-headline-sm text-primary-container font-bold" id="detail-macro-fat">29.5g</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Micronutrients Table (FR-N4: missing flagged) -->
+        <div class="rounded-xl bg-surface-container-low p-space-md shadow-sm space-y-space-sm">
+          <span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">MICRONUTRIENT STRATA</span>
+          <div class="grid grid-cols-2 gap-2 text-left pt-1" id="detail-micros-container">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Commit Confirmation Button -->
+        <button onclick="confirmAndLogSpecimen()" class="w-full py-4 bg-primary-container hover:bg-primary-fixed-dim text-on-primary font-label-lg text-label-lg font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-2 shadow-[0_0_24px_rgba(0,255,136,0.4)] active:scale-[0.98] transition-all">
+          <span class="material-symbols-outlined text-xl">check_circle</span>
+          <span>CONFIRM & LOG SPECIMEN</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VIEW 4: MEALS DIARY (Daily Fuel Log)       -->
+    <!-- ========================================== -->
+    <section id="view-meals-diary" class="view-panel hidden flex flex-col w-full text-on-surface px-margin gap-space-md pt-2">
+      <!-- Date Switcher Ribbon -->
+      <section class="flex items-center justify-between bg-surface-container-low p-space-xs rounded-xl shadow-md">
+        <button onclick="changeDiaryDate(-1)" class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary-container active:scale-95 transition-all">
+          <span class="material-symbols-outlined text-lg">chevron_left</span>
+        </button>
+        <div class="flex items-center gap-space-xs">
+          <div class="flex flex-col items-center px-space-sm py-1 bg-surface-container-highest rounded-lg shadow-[0_0_12px_rgba(0,255,136,0.15)]">
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-ping"></span>
+              <span class="font-label-md text-label-md text-primary-container font-semibold tracking-wider" id="diary-date-label">TODAY // 04 OCT</span>
+            </div>
+            <span class="font-label-sm text-label-sm text-on-surface-variant tracking-widest mt-0.5">CYCLE 18 • PHASE 2</span>
+          </div>
+        </div>
+        <button onclick="changeDiaryDate(1)" class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary-container active:scale-95 transition-all">
+          <span class="material-symbols-outlined text-lg">chevron_right</span>
+        </button>
+      </section>
+
+      <!-- Intake Energy Telemetry Pod -->
+      <section class="bg-surface-container-low p-space-md rounded-xl shadow-lg relative overflow-hidden">
+        <div class="flex items-start justify-between mb-space-sm">
+          <div class="flex flex-col">
+            <span class="font-label-sm text-label-sm text-on-surface-variant tracking-widest uppercase">METABOLIC EXPENDITURE</span>
+            <div class="flex items-baseline gap-space-2xs mt-0.5">
+              <span class="font-display-lg-mobile text-display-lg-mobile font-bold tracking-tight text-primary" id="diary-intake-kcal">1,080</span>
+              <span class="font-label-md text-label-md text-on-surface-variant">/ 2,150 KCAL</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-high text-primary-container shadow-sm">
+            <span class="material-symbols-outlined text-sm animate-pulse">vital_signs</span>
+            <span class="font-label-sm text-label-sm tracking-wider uppercase font-semibold">SYNCED +350</span>
+          </div>
+        </div>
+
+        <!-- Segmented Macro Budget Bar -->
+        <div class="w-full bg-surface-container-lowest h-3 rounded-full overflow-hidden p-0.5 flex gap-0.5 shadow-inner">
+          <div class="h-full bg-error rounded-l-full" id="diary-bar-p" style="width: 25%"></div>
+          <div class="h-full bg-secondary-container" id="diary-bar-c" style="width: 45%"></div>
+          <div class="h-full bg-primary-container rounded-r-full" id="diary-bar-f" style="width: 30%"></div>
+        </div>
+      </section>
+
+      <!-- Meal Chrono Slots -->
+      <div id="diary-slots-container" class="space-y-space-md pb-4">
+        <!-- Breakfast Slot -->
+        <div class="bg-surface-container-low rounded-xl p-space-md shadow-sm space-y-space-xs" data-meal="breakfast">
+          <div class="flex items-center justify-between pb-1 border-b border-surface-container">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary-fixed-dim text-lg">wb_twilight</span>
+              <span class="font-headline-sm text-[16px] text-tertiary uppercase font-bold">BREAKFAST</span>
+            </div>
+            <span class="font-label-sm text-primary-container font-mono" id="brk-kcal">0 KCAL</span>
+          </div>
+          <div class="meal-slot-items space-y-2 pt-1" id="slot-breakfast-items">
+            <div class="text-on-surface-variant/60 font-label-sm text-center py-2">NO SPECIMENS RECORDED</div>
+          </div>
+          <button onclick="promptAddFoodToSlot('breakfast')" class="w-full py-2 bg-surface-container hover:bg-surface-container-high text-primary-container rounded-lg font-label-sm text-label-sm uppercase tracking-wider flex items-center justify-center gap-1 transition-all">
+            <span class="material-symbols-outlined text-base">add</span> ADD ITEM
+          </button>
+        </div>
+
+        <!-- Lunch Slot -->
+        <div class="bg-surface-container-low rounded-xl p-space-md shadow-sm space-y-space-xs" data-meal="lunch">
+          <div class="flex items-center justify-between pb-1 border-b border-surface-container">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary-container text-lg">wb_sunny</span>
+              <span class="font-headline-sm text-[16px] text-tertiary uppercase font-bold">LUNCH</span>
+            </div>
+            <span class="font-label-sm text-primary-container font-mono" id="lun-kcal">0 KCAL</span>
+          </div>
+          <div class="meal-slot-items space-y-2 pt-1" id="slot-lunch-items"></div>
+          <button onclick="promptAddFoodToSlot('lunch')" class="w-full py-2 bg-surface-container hover:bg-surface-container-high text-primary-container rounded-lg font-label-sm text-label-sm uppercase tracking-wider flex items-center justify-center gap-1 transition-all">
+            <span class="material-symbols-outlined text-base">add</span> ADD ITEM
+          </button>
+        </div>
+
+        <!-- Snacks Slot -->
+        <div class="bg-surface-container-low rounded-xl p-space-md shadow-sm space-y-space-xs" data-meal="snack">
+          <div class="flex items-center justify-between pb-1 border-b border-surface-container">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-lg">bakery_dining</span>
+              <span class="font-headline-sm text-[16px] text-tertiary uppercase font-bold">SNACKS</span>
+            </div>
+            <span class="font-label-sm text-primary-container font-mono" id="snk-kcal">0 KCAL</span>
+          </div>
+          <div class="meal-slot-items space-y-2 pt-1" id="slot-snack-items"></div>
+          <button onclick="promptAddFoodToSlot('snack')" class="w-full py-2 bg-surface-container hover:bg-surface-container-high text-primary-container rounded-lg font-label-sm text-label-sm uppercase tracking-wider flex items-center justify-center gap-1 transition-all">
+            <span class="material-symbols-outlined text-base">add</span> ADD ITEM
+          </button>
+        </div>
+
+        <!-- Dinner Slot -->
+        <div class="bg-surface-container-low rounded-xl p-space-md shadow-sm space-y-space-xs" data-meal="dinner">
+          <div class="flex items-center justify-between pb-1 border-b border-surface-container">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-outline text-lg">dark_mode</span>
+              <span class="font-headline-sm text-[16px] text-tertiary uppercase font-bold">DINNER</span>
+            </div>
+            <span class="font-label-sm text-primary-container font-mono" id="din-kcal">0 KCAL</span>
+          </div>
+          <div class="meal-slot-items space-y-2 pt-1" id="slot-dinner-items"></div>
+          <button onclick="promptAddFoodToSlot('dinner')" class="w-full py-2 bg-surface-container hover:bg-surface-container-high text-primary-container rounded-lg font-label-sm text-label-sm uppercase tracking-wider flex items-center justify-center gap-1 transition-all">
+            <span class="material-symbols-outlined text-base">add</span> ADD ITEM
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VIEW 5: NUTRITION ANALYTICS & TRENDS       -->
+    <!-- ========================================== -->
+    <section id="view-nutrition-analytics" class="view-panel hidden flex flex-col w-full px-margin space-y-space-md text-on-surface pt-2">
+      <!-- Range Filter Calibration Selector -->
+      <div class="flex items-center justify-between bg-surface-container p-1 rounded-xl shadow-inner">
+        <button class="flex-1 py-1.5 px-space-xs text-center font-label-sm text-label-sm uppercase rounded-lg text-on-surface-variant hover:text-on-surface transition-all">
+          24H Telemetry
+        </button>
+        <button class="flex-1 py-1.5 px-space-xs text-center font-label-sm text-label-sm uppercase rounded-lg bg-surface-container-high text-primary-container font-semibold shadow-sm flex items-center justify-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>
+          7D Cycle
+        </button>
+        <button class="flex-1 py-1.5 px-space-xs text-center font-label-sm text-label-sm uppercase rounded-lg text-on-surface-variant hover:text-on-surface transition-all">
+          30D Trend
+        </button>
+      </div>
+
+      <!-- Weekly Caloric Telemetry Chart Card -->
+      <div class="bg-surface-container rounded-xl p-space-md shadow-md flex flex-col space-y-space-sm relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="font-headline-sm text-headline-sm text-tertiary tracking-tight uppercase flex items-center gap-2">
+              Caloric Cadence
+              <span class="material-symbols-outlined text-primary-container text-base">monitoring</span>
+            </span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Target: 2,150 kcal/day Baseline</span>
+          </div>
+          <div class="flex items-center gap-1.5 bg-surface-container-low px-2 py-1 rounded">
+            <span class="w-2 h-2 rounded-full bg-primary-container"></span>
+            <span class="font-label-sm text-label-sm text-on-surface font-semibold">94.2% FIT</span>
+          </div>
+        </div>
+
+        <!-- 7-Day Vertical Bar Grid -->
+        <div class="relative w-full pt-4 pb-2 bg-surface-container-lowest rounded-lg px-2 shadow-inner">
+          <div class="absolute left-2 right-2 top-[34%] flex items-center z-10 pointer-events-none">
+            <div class="w-full border-t border-dashed border-primary-container/40"></div>
+            <span class="font-label-sm text-[9px] text-primary-container bg-surface-container-lowest px-1 ml-1 shrink-0 font-bold">2,150 TARGET</span>
+          </div>
+          <div class="flex items-end justify-between h-44 pt-6 px-1 relative z-20">
+            <!-- Day 1: MO -->
+            <div class="flex flex-col items-center flex-1 group cursor-pointer">
+              <span class="font-label-sm text-[9px] text-secondary font-mono mb-1.5 opacity-90">2.3k</span>
+              <div class="w-6 bg-surface-container-high rounded-t flex flex-col justify-end overflow-hidden h-32 p-0.5">
+                <div class="w-full bg-secondary rounded-t h-[92%] shadow-[0_0_8px_rgba(255,122,26,0.35)]"></div>
+              </div>
+              <span class="font-label-sm text-[10px] text-on-surface-variant uppercase mt-1">MO</span>
+            </div>
+            <!-- Day 2: TU -->
+            <div class="flex flex-col items-center flex-1 group cursor-pointer">
+              <span class="font-label-sm text-[9px] text-primary-container font-mono mb-1.5 opacity-90">2.1k</span>
+              <div class="w-6 bg-surface-container-high rounded-t flex flex-col justify-end overflow-hidden h-32 p-0.5">
+                <div class="w-full bg-primary-container rounded-t h-[75%] shadow-[0_0_8px_rgba(0,255,136,0.35)]"></div>
+              </div>
+              <span class="font-label-sm text-[10px] text-on-surface-variant uppercase mt-1">TU</span>
+            </div>
+            <!-- Day 3: WE -->
+            <div class="flex flex-col items-center flex-1 group cursor-pointer">
+              <span class="font-label-sm text-[9px] text-primary-container font-mono mb-1.5 opacity-90">2.15k</span>
+              <div class="w-6 bg-surface-container-high rounded-t flex flex-col justify-end overflow-hidden h-32 p-0.5">
+                <div class="w-full bg-primary-container rounded-t h-[78%] shadow-[0_0_8px_rgba(0,255,136,0.35)]"></div>
+              </div>
+              <span class="font-label-sm text-[10px] text-on-surface-variant uppercase mt-1">WE</span>
+            </div>
+            <!-- Day 4: TH -->
+            <div class="flex flex-col items-center flex-1 group cursor-pointer">
+              <span class="font-label-sm text-[9px] text-secondary font-mono mb-1.5 opacity-90">2.4k</span>
+              <div class="w-6 bg-surface-container-high rounded-t flex flex-col justify-end overflow-hidden h-32 p-0.5">
+                <div class="w-full bg-secondary rounded-t h-[96%] shadow-[0_0_8px_rgba(255,122,26,0.35)]"></div>
+              </div>
+              <span class="font-label-sm text-[10px] text-on-surface-variant uppercase mt-1">TH</span>
+            </div>
+            <!-- Day 5: FR -->
+            <div class="flex flex-col items-center flex-1 group cursor-pointer">
+              <span class="font-label-sm text-[9px] text-primary-container font-mono mb-1.5 opacity-90">1.95k</span>
+              <div class="w-6 bg-surface-container-high rounded-t flex flex-col justify-end overflow-hidden h-32 p-0.5">
+                <div class="w-full bg-primary-container rounded-t h-[68%] shadow-[0_0_8px_rgba(0,255,136,0.35)]"></div>
+              </div>
+              <span class="font-label-sm text-[10px] text-on-surface-variant uppercase mt-1">FR</span>
+            </div>
+            <!-- Day 6: SA -->
+            <div class="flex flex-col items-center flex-1 group cursor-pointer">
+              <span class="font-label-sm text-[9px] text-error font-mono mb-1.5 opacity-90">2.6k</span>
+              <div class="w-6 bg-surface-container-high rounded-t flex flex-col justify-end overflow-hidden h-32 p-0.5">
+                <div class="w-full bg-error rounded-t h-[100%] shadow-[0_0_8px_rgba(255,51,102,0.35)]"></div>
+              </div>
+              <span class="font-label-sm text-[10px] text-on-surface-variant uppercase mt-1">SA</span>
+            </div>
+            <!-- Day 7: SU (Today) -->
+            <div class="flex flex-col items-center flex-1 group cursor-pointer">
+              <span class="font-label-sm text-[9px] text-primary-container font-mono mb-1.5 opacity-90">1.08k</span>
+              <div class="w-6 bg-surface-container-high rounded-t flex flex-col justify-end overflow-hidden h-32 p-0.5 border border-primary-container/40">
+                <div class="w-full bg-primary-container rounded-t h-[42%] shadow-[0_0_8px_rgba(0,255,136,0.5)] animate-pulse"></div>
+              </div>
+              <span class="font-label-sm text-[10px] text-primary-container uppercase font-bold mt-1">SU</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Macro Ratio Balance Card -->
+      <div class="bg-surface-container rounded-xl p-space-md shadow-md space-y-space-sm">
+        <span class="font-headline-sm text-headline-sm text-tertiary uppercase">MACRO SPLIT CADENCE</span>
+        <div class="grid grid-cols-3 gap-2 text-center pt-1">
+          <div class="bg-surface-container-low p-space-xs rounded-lg">
+            <span class="font-label-sm text-outline">PROTEIN</span>
+            <div class="font-headline-sm text-error font-bold">28%</div>
+            <span class="text-[10px] text-outline font-mono">Target: 30%</span>
+          </div>
+          <div class="bg-surface-container-low p-space-xs rounded-lg">
+            <span class="font-label-sm text-outline">CARBOHYDRATE</span>
+            <div class="font-headline-sm text-secondary font-bold">48%</div>
+            <span class="text-[10px] text-outline font-mono">Target: 45%</span>
+          </div>
+          <div class="bg-surface-container-low p-space-xs rounded-lg">
+            <span class="font-label-sm text-outline">LIPIDS (FAT)</span>
+            <div class="font-headline-sm text-primary-container font-bold">24%</div>
+            <span class="text-[10px] text-outline font-mono">Target: 25%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MODAL: PHASE 9 MODEL OPS & REVIEWER HUB    -->
+    <!-- ========================================== -->
+    <div id="modal-model-ops" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-surface-container w-full max-w-2xl max-h-[90vh] rounded-t-2xl sm:rounded-2xl flex flex-col border border-surface-bright shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        
+        <!-- Header -->
+        <div class="px-gutter py-4 bg-surface-container-high border-b border-surface-bright flex items-center justify-between">
+          <div class="flex items-center gap-space-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-primary-container animate-pulse"></span>
+            <div>
+              <h3 class="font-headline-sm text-headline-sm uppercase text-on-surface">MODEL OPS &amp; FEEDBACK PIPELINE</h3>
+              <p class="font-label-sm text-label-sm text-on-surface-variant font-mono">PHASE 9 // RETRAINING LOOP &amp; REGISTRY</p>
+            </div>
+          </div>
+          <button onclick="closeModelOpsModal()" class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-bright flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors">
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </div>
+
+        <!-- Sub Tabs -->
+        <div class="flex border-b border-surface-bright bg-surface-container-low px-gutter overflow-x-auto">
+          <button onclick="switchOpsTab('registry')" id="opstab-registry" class="px-4 py-3 font-label-sm text-label-sm uppercase font-semibold tracking-wider text-primary-container border-b-2 border-primary-container transition-all">REGISTRY</button>
+          <button onclick="switchOpsTab('etl')" id="opstab-etl" class="px-4 py-3 font-label-sm text-label-sm uppercase font-semibold tracking-wider text-on-surface-variant border-b-2 border-transparent transition-all">FEEDBACK ETL</button>
+          <button onclick="switchOpsTab('analytics')" id="opstab-analytics" class="px-4 py-3 font-label-sm text-label-sm uppercase font-semibold tracking-wider text-on-surface-variant border-b-2 border-transparent transition-all">ERROR ANALYTICS</button>
+          <button onclick="switchOpsTab('consent')" id="opstab-consent" class="px-4 py-3 font-label-sm text-label-sm uppercase font-semibold tracking-wider text-on-surface-variant border-b-2 border-transparent transition-all">PRIVACY &amp; CONSENT</button>
+        </div>
+
+        <!-- Modal Body Content -->
+        <div class="flex-1 overflow-y-auto p-gutter space-y-4">
+
+          <!-- 1. REGISTRY PANEL -->
+          <div id="opspanel-registry" class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-label-sm text-outline uppercase tracking-wider">REGISTERED MODEL VERSIONS</span>
+              <button onclick="loadModelRegistry()" class="text-xs font-mono text-primary-fixed-dim hover:underline flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">refresh</span> REFRESH
+              </button>
+            </div>
+            <div id="ops-model-list" class="space-y-2">
+              <div class="p-3 rounded-lg bg-surface-container-low text-center font-mono text-xs text-outline">Loading model registry...</div>
+            </div>
+          </div>
+
+          <!-- 2. FEEDBACK ETL PANEL -->
+          <div id="opspanel-etl" class="hidden space-y-4">
+            <div class="p-4 rounded-xl bg-surface-container-low border border-surface-bright flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-label-md font-bold text-on-surface uppercase">AUTOMATED FEEDBACK ETL</div>
+                  <div class="font-label-sm text-on-surface-variant text-xs">Validates consent, perceptual hash dedup, leakage guards &amp; culinary bounds</div>
+                </div>
+                <button onclick="runFeedbackETL()" id="btn-run-etl" class="px-3 py-1.5 rounded-lg bg-primary-container text-on-primary font-label-sm font-bold uppercase hover:bg-primary-fixed-dim transition-all shadow-[0_0_12px_rgba(0,255,136,0.3)] flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">play_arrow</span> RUN ETL
+                </button>
+              </div>
+              <div id="etl-stats-box" class="hidden grid grid-cols-4 gap-2 pt-2 border-t border-surface-bright text-center font-mono text-xs">
+                <div class="p-2 rounded bg-surface-container"><span class="text-outline block">PROCESSED</span><span id="etl-proc-val" class="font-bold text-on-surface">0</span></div>
+                <div class="p-2 rounded bg-surface-container"><span class="text-primary-container block">QUEUED</span><span id="etl-queue-val" class="font-bold text-primary-container">0</span></div>
+                <div class="p-2 rounded bg-surface-container"><span class="text-error block">REJECTED</span><span id="etl-rej-val" class="font-bold text-error">0</span></div>
+                <div class="p-2 rounded bg-surface-container"><span class="text-secondary-fixed-dim block">NO CONSENT</span><span id="etl-consent-val" class="font-bold text-secondary-fixed-dim">0</span></div>
+              </div>
+            </div>
+
+            <!-- Pending Review List -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-label-sm text-outline uppercase tracking-wider">QUEUED CANDIDATES FOR REVIEW</span>
+                <button onclick="loadPendingReviews()" class="text-xs font-mono text-primary-fixed-dim hover:underline flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">refresh</span> REFRESH
+                </button>
+              </div>
+              <div id="ops-pending-list" class="space-y-2">
+                <div class="p-3 rounded-lg bg-surface-container-low text-center font-mono text-xs text-outline">Loading queued reviews...</div>
+              </div>
+            </div>
+
+            <!-- Build Dataset Version -->
+            <div class="p-4 rounded-xl bg-surface-container-low border border-surface-bright space-y-2">
+              <div class="font-label-md font-bold text-on-surface uppercase">SNAPSHOT DATASET VERSION</div>
+              <p class="text-xs text-on-surface-variant font-mono">Generates immutable DVC-ready dataset snapshot from approved corrections with group-aware splitting.</p>
+              <div class="flex gap-2">
+                <input id="new-dataset-id" type="text" placeholder="ds-2026.02" class="flex-1 px-3 py-1.5 rounded-lg bg-surface border border-outline/30 text-on-surface font-mono text-xs focus:outline-none focus:border-primary-container" />
+                <button onclick="triggerBuildDataset()" class="px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm font-semibold uppercase text-xs">CREATE SNAPSHOT</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. ERROR ANALYTICS PANEL -->
+          <div id="opspanel-analytics" class="hidden space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 rounded-xl bg-surface-container-low border border-surface-bright">
+                <span class="font-label-sm text-outline uppercase">PORTION ESTIMATION BIAS</span>
+                <div id="portion-bias-val" class="font-headline-sm text-primary-container font-bold mt-1">0.0%</div>
+                <span class="text-[10px] text-on-surface-variant font-mono">Mean AI vs user gram delta</span>
+              </div>
+              <div class="p-3 rounded-xl bg-surface-container-low border border-surface-bright">
+                <span class="font-label-sm text-outline uppercase">TOTAL CORRECTIONS</span>
+                <div id="total-corr-val" class="font-headline-sm text-secondary-fixed-dim font-bold mt-1">0</div>
+                <span class="text-[10px] text-on-surface-variant font-mono">Captured verification events</span>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-surface-container-low border border-surface-bright space-y-2">
+              <div class="font-label-sm font-bold text-outline uppercase tracking-wider">TOP CONFUSION PAIRS (AI -&gt; USER)</div>
+              <div id="confusion-pairs-list" class="space-y-1 font-mono text-xs">
+                <div class="text-outline">No confusion events logged yet.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. PRIVACY & CONSENT PANEL -->
+          <div id="opspanel-consent" class="hidden space-y-4">
+            <div class="p-4 rounded-xl bg-surface-container-low border border-surface-bright space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-label-md font-bold text-on-surface uppercase">TRAINING DATA PARTICIPATION</div>
+                  <div class="font-label-sm text-on-surface-variant text-xs mt-0.5">Allow anonymized meal photographs to improve Indian food recognition models.</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="consent-toggle" class="sr-only peer" onchange="toggleTrainingConsent(this.checked)">
+                  <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+                </label>
+              </div>
+              <div class="p-3 rounded-lg bg-surface border border-outline/20 font-mono text-[11px] text-on-surface-variant space-y-1">
+                <div class="flex items-center gap-1 text-primary-fixed-dim font-semibold">
+                  <span class="material-symbols-outlined text-sm">verified_user</span> PRIVACY PROTOCOL
+                </div>
+                <p>• Only photos confirmed by you are considered.</p>
+                <p>• All personal data, location, and metadata are stripped.</p>
+                <p>• Perceptual hashing and facial blur filters are applied before human review.</p>
+                <p>• You can revoke consent at any time.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: MOBILE APP DOWNLOAD & INSTALL (PWA) -->
+    <!-- ========================================== -->
+    <div id="modal-mobile-app" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-surface-container w-full max-w-lg max-h-[90vh] rounded-t-2xl sm:rounded-2xl flex flex-col border border-surface-bright shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        
+        <!-- Header -->
+        <div class="px-gutter py-4 bg-surface-container-high border-b border-surface-bright flex items-center justify-between">
+          <div class="flex items-center gap-space-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-primary-container animate-pulse"></span>
+            <div>
+              <h3 class="font-headline-sm text-headline-sm uppercase text-on-surface">NUTRILENS MOBILE CLIENT</h3>
+              <p class="font-label-sm text-label-sm text-on-surface-variant font-mono">FLUTTER HYBRID // ANDROID &amp; iOS PWA</p>
+            </div>
+          </div>
+          <button onclick="closeMobileAppModal()" class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-bright flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors">
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="flex-1 overflow-y-auto p-gutter space-y-4">
+          <!-- Hero Banner -->
+          <div class="p-4 rounded-xl bg-gradient-to-br from-primary-container/20 to-surface-container border border-primary-container/30 flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-primary-container flex items-center justify-center text-on-primary shadow-lg shadow-primary-container/20 shrink-0">
+              <span class="material-symbols-outlined text-3xl">restaurant_menu</span>
+            </div>
+            <div>
+              <h4 class="font-headline-sm text-on-surface text-base">NutriLens Native Mobile</h4>
+              <p class="text-xs text-on-surface-variant mt-0.5">Hardware-accelerated Skia rendering, on-device offline caching &amp; instant camera thali scanning.</p>
+            </div>
+          </div>
+
+          <!-- Quick Launch Buttons -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <a href="/mobile/" target="_blank" class="h-12 px-3 rounded-xl bg-primary-container hover:bg-primary-fixed-dim text-on-primary font-headline-sm text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-md shadow-primary-container/20 text-center">
+              <span class="material-symbols-outlined text-lg">open_in_new</span>
+              Launch App
+            </a>
+            <a href="/v1/mobile/download-apk" download="nutrilens.apk" class="h-12 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-primary-container border border-primary-container/50 font-headline-sm text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all text-center">
+              <span class="material-symbols-outlined text-lg">android</span>
+              Download APK (148MB)
+            </a>
+            <a href="/v1/mobile/download" download="nutrilens-mobile-app.zip" class="h-12 px-3 rounded-xl bg-surface-container-high hover:bg-surface-bright text-primary-fixed-dim border border-primary-container/30 font-headline-sm text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all text-center">
+              <span class="material-symbols-outlined text-lg">folder_zip</span>
+              PWA .ZIP (14MB)
+            </a>
+          </div>
+
+          <!-- 24/7 Standalone & Laptop-Off Banner -->
+          <div class="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/30 space-y-1.5">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-purple-400 text-lg">bolt</span>
+              <span class="font-headline-sm text-xs text-purple-200 uppercase tracking-wider font-bold">USE 24/7 ON YOUR PHONE (NO LAPTOP NEEDED)</span>
+            </div>
+            <p class="text-on-surface-variant text-[11px] leading-relaxed">
+              NutriLens now features an <b>Autonomous On-Device AI Engine</b>! Once installed on your phone, you can track meals, calculate Indian macros, and maintain your food diary <b>completely offline</b>—even when your laptop is turned off or asleep.
+            </p>
+            <p class="text-[11px] text-purple-300 font-mono">
+              Tip: Inside the app, tap the connection pill in the top header to configure a 24/7 free cloud server (Render/Railway) or switch to full offline mode.
+            </p>
+          </div>
+
+          <!-- Wi-Fi Phone Connection Box -->
+          <div class="p-3.5 rounded-xl bg-surface-container-low border border-outline/20 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-label-sm text-[11px] text-primary-fixed-dim uppercase tracking-wider font-semibold flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">wifi</span> Open On Your Phone (Same Wi-Fi)
+              </span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-primary-container/10 text-primary-container font-bold">PORT 8000</span>
+            </div>
+            <div class="flex items-center gap-2 bg-surface p-2.5 rounded-lg border border-outline/10">
+              <input type="text" readonly value="http://10.0.89.21:8000/mobile/" id="mobile-url-input" class="bg-transparent font-mono text-xs text-on-surface flex-1 outline-none select-all">
+              <button onclick="navigator.clipboard.writeText('http://10.0.89.21:8000/mobile/'); alert('Link copied to clipboard!');" class="px-2.5 py-1 text-[11px] font-mono rounded bg-surface-container-high hover:bg-surface-bright text-on-surface transition-all">
+                Copy
+              </button>
+            </div>
+          </div>
+
+          <!-- Install Guides for Android & iOS -->
+          <div class="space-y-2 pt-1">
+            <span class="font-label-sm text-[11px] text-outline uppercase tracking-wider">1-Tap Installation Guides</span>
+            
+            <!-- Android Guide -->
+            <div class="p-3 rounded-lg bg-surface border border-outline/15 text-xs space-y-1.5">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5 text-on-surface font-semibold">
+                  <span class="material-symbols-outlined text-sm text-primary-container">android</span> Android Native APK &amp; PWA
+                </div>
+                <a href="/v1/mobile/download-apk" download="nutrilens.apk" class="text-[11px] font-mono text-primary-container hover:underline flex items-center gap-0.5">
+                  <span class="material-symbols-outlined text-xs">download</span> Direct APK
+                </a>
+              </div>
+              <p class="text-on-surface-variant text-[11px]"><b>Option 1 (Direct Android APK):</b> Tap <b>"Download APK"</b> above to download <code>nutrilens.apk</code> (148MB) and tap to install directly on your Android phone.</p>
+              <p class="text-on-surface-variant text-[11px]"><b>Option 2 (Instant Web PWA):</b> Open <code>http://10.0.89.21:8000/mobile/</code> in Chrome on Android, tap menu (⋮) and select <b>"Install app"</b> or <b>"Add to Home Screen"</b>.</p>
+            </div>
+
+            <!-- iOS Guide -->
+            <div class="p-3 rounded-lg bg-surface border border-outline/15 text-xs space-y-1">
+              <div class="flex items-center gap-1.5 text-on-surface font-semibold">
+                <span class="material-symbols-outlined text-sm text-secondary">apple</span> iOS (Safari)
+              </div>
+              <p class="text-on-surface-variant text-[11px]">1. Open the link above in Safari on your iPhone or iPad.</p>
+              <p class="text-on-surface-variant text-[11px]">2. Tap the <b>Share button</b> (box with arrow pointing up).</p>
+              <p class="text-on-surface-variant text-[11px]">3. Scroll down and tap <b>"Add to Home Screen"</b>.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Universal Bottom Navigation Bar (Matching exact template markup) -->
+  <nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.6)]">
+    <div class="flex justify-around items-center h-20 px-gutter max-w-2xl mx-auto">
+      <!-- DASH -->
+      <a id="nav-dashboard" onclick="switchTab('dashboard')" class="nav-link flex flex-col items-center justify-center gap-space-2xs min-w-[56px] min-h-[44px] transition-all text-primary-container cursor-pointer">
+        <span class="material-symbols-outlined text-2xl">speed</span>
+        <span class="font-label-sm text-label-sm tracking-widest uppercase">DASH</span>
+      </a>
+      <!-- DIARY -->
+      <a id="nav-meals-diary" onclick="switchTab('meals-diary')" class="nav-link flex flex-col items-center justify-center gap-space-2xs min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all cursor-pointer">
+        <span class="material-symbols-outlined text-2xl">dataset</span>
+        <span class="font-label-sm text-label-sm tracking-widest uppercase">DIARY</span>
+      </a>
+      <!-- SCAN (Center Highlight) -->
+      <a id="nav-quick-log" onclick="switchTab('quick-log')" class="nav-link relative -top-2 flex flex-col items-center justify-center min-w-[52px] min-h-[52px] text-on-surface-variant hover:text-on-surface transition-all group cursor-pointer">
+        <div class="w-12 h-12 rounded-lg bg-primary-container text-on-primary flex items-center justify-center shadow-[0_0_16px_rgba(0,255,136,0.35)] group-hover:bg-primary-fixed-dim transition-all">
+          <span class="material-symbols-outlined text-2xl font-bold">center_focus_strong</span>
+        </div>
+        <span class="font-label-sm text-label-sm tracking-widest text-primary-container mt-1 font-semibold uppercase">SCAN</span>
+      </a>
+      <!-- TRENDS -->
+      <a id="nav-nutrition-analytics" onclick="switchTab('nutrition-analytics')" class="nav-link flex flex-col items-center justify-center gap-space-2xs min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all cursor-pointer">
+        <span class="material-symbols-outlined text-2xl">query_stats</span>
+        <span class="font-label-sm text-label-sm tracking-widest uppercase">TRENDS</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Interactive Scripts -->
+  <script src="/app.js"></script>
+</body>
+</html>

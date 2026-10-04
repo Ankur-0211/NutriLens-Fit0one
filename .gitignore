@@ -1,0 +1,46 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+
+# Database
+nutrilens.db
+*.sqlite3
+
+# Uploads (runtime data)
+uploads/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Flutter build outputs (too large for git)
+mobile/build/
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+
+# APK files (hosted on GitHub Releases instead)
+*.apk
+
+# Node
+node_modules/
+
+# Environment
+.env
+.env.local
+
+# Stitch assets (generated)
+stitch_calorie_counter_app_interface/
