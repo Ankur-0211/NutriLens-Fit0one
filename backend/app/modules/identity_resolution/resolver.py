@@ -40,18 +40,55 @@ class FoodIdentityResolver:
         )
 
         if not mappings:
-            # Fallback for unmapped visual class -> direct slug or unknown
-            food = self.db.query(Food).filter(Food.id == visual_class_id).first()
+            VISUAL_TO_CANONICAL = {
+                "paneer_red_gravy": "paneer_butter_masala",
+                "shahi_paneer_yellow": "paneer_butter_masala",
+                "palak_paneer_green": "palak_paneer",
+                "chicken_red_curry": "chicken_curry",
+                "butter_chicken_creamy": "butter_chicken",
+                "mutton_curry_dark": "mutton_curry",
+                "fish_curry_yellow": "fish_curry",
+                "yellow_dal": "dal_tadka",
+                "black_dal_gravy": "dal_makhani",
+                "sambar_curry": "sambar",
+                "rajma_curry": "rajma",
+                "chole_curry": "chole",
+                "flatbread_roti": "roti_plain",
+                "layered_flatbread_paratha": "paratha_plain",
+                "naan_bread": "naan_butter",
+                "puri_poori": "puri",
+                "white_rice_grain": "basmati_rice_steamed",
+                "spiced_rice_dish": "jeera_rice",
+                "biryani_rice_dish": "biryani_veg",
+                "poha_dish": "poha",
+                "khichdi_dish": "khichdi",
+                "idli_steamed": "idli",
+                "dosa_crisp": "dosa",
+                "samosa_fried": "samosa",
+                "pav_bhaji": "pav_bhaji",
+                "pizza_slice": "pizza_veg",
+                "french_fries": "french_fries",
+                "curd_bowl": "curd_plain",
+                "green_salad_raw": "salad_green",
+                "apple_fruit": "apple",
+                "banana_fruit": "banana",
+                "tea_chai_cup": "chai_masala",
+            }
+            target_food_id = VISUAL_TO_CANONICAL.get(visual_class_id, visual_class_id)
+            food = self.db.query(Food).filter(Food.id == target_food_id).first()
+            if not food:
+                food = self.db.query(Food).filter(Food.id == visual_class_id).first()
+
             if food:
                 food_id = food.id
                 food_name = food.display_name
                 variant_id = f"{food_id}:default"
                 ambiguity = "none"
             else:
-                food_id = "unknown_food"
-                food_name = visual_class_id.replace("_", " ").title()
-                variant_id = "unknown_food:default"
-                ambiguity = "food"
+                food_id = target_food_id
+                food_name = target_food_id.replace("_", " ").title()
+                variant_id = f"{food_id}:default"
+                ambiguity = "none"
 
             return FoodIdentityResult(
                 visual=VisualInfo(visual_class_id=visual_class_id, score=round(visual_score, 2)),

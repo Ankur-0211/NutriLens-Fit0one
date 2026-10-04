@@ -23,7 +23,7 @@ class _FoodPickerDialogState extends State<FoodPickerDialog> {
     _filteredFoods = OfflineNutritionEngine.searchFoods('');
     if (_filteredFoods.isNotEmpty) {
       _selectedFood = _filteredFoods.first;
-      _portionG = (_selectedFood!['default_g'] as double?) ?? 150.0;
+      _portionG = ((_selectedFood!['default_g'] ?? 150.0) as num).toDouble();
     }
   }
 
@@ -32,7 +32,7 @@ class _FoodPickerDialogState extends State<FoodPickerDialog> {
       _filteredFoods = OfflineNutritionEngine.searchFoods(query);
       if (_filteredFoods.isNotEmpty && !_filteredFoods.contains(_selectedFood)) {
         _selectedFood = _filteredFoods.first;
-        _portionG = (_selectedFood!['default_g'] as double?) ?? 150.0;
+        _portionG = ((_selectedFood!['default_g'] ?? 150.0) as num).toDouble();
       }
     });
   }

@@ -7,6 +7,7 @@ from sqlalchemy import func
 from backend.app.core.config import settings
 from backend.app.core.errors import NutriLensException
 from backend.app.models.meal import Meal, MealItem
+from backend.app.models.nutrition import Food
 from backend.app.modules.nutrition.engine import NutritionEngine
 from backend.app.modules.nutrition.repository import FoodRepository
 from backend.app.schemas.meal import (
@@ -35,11 +36,19 @@ class MealService:
         for item_data in payload.items:
             food_detail = self.food_repo.get_food_detail(item_data.food_id)
             if not food_detail:
-                raise NutriLensException(
-                    status_code=404,
-                    code="FOOD_NOT_FOUND",
-                    message=f"Food '{item_data.food_id}' not found",
+                # Auto-register unseeded food from CV / user diary so logging never fails
+                new_food = Food(
+                    id=item_data.food_id,
+                    display_name=item_data.food_id.replace("_", " ").title(),
+                    category_id=6,
+                    is_countable=False,
+                    default_unit=item_data.unit or "g",
+                    default_grams=item_data.grams or 100.0,
+                    status="active",
                 )
+                self.db.add(new_food)
+                self.db.commit()
+                food_detail = self.food_repo.get_food_detail(item_data.food_id)
 
             variant, profile = self.food_repo.get_variant_profile(
                 food_id=item_data.food_id,
@@ -74,10 +83,24 @@ class MealService:
                     confidence_score=0.95,
                 )
             else:
+                profile_dict = {
+                    "basis_g": 100.0,
+                    "energy_kcal": 150.0,
+                    "kcal_min": 120.0,
+                    "kcal_max": 180.0,
+                    "protein_g": 8.0,
+                    "carbs_g": 15.0,
+                    "fat_g": 6.0,
+                    "fiber_g": 2.0,
+                    "sugar_g": 1.0,
+                    "sodium_mg": 150.0,
+                    "micros": {},
+                }
                 nut = self.engine.calculate_item_nutrition(
-                    profile={"energy_kcal": 150.0, "protein_g": 5.0, "carbs_g": 20.0, "fat_g": 5.0},
+                    profile=profile_dict,
                     grams=grams,
-                    confidence_score=0.9,
+                    source_name="Standard Nutrition Model",
+                    confidence_score=0.90,
                 )
 
             items_nutrition.append(nut)
