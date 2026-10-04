@@ -11,7 +11,7 @@ from backend.app.modules.optimization.benchmarks import InferenceBenchmarkSuite
 # External APK download URL (points to fast 24/7 GitHub Releases CDN)
 EXTERNAL_APK_URL = os.environ.get(
     "EXTERNAL_APK_URL",
-    "https://github.com/Ankur-0211/NutriLens-Fit0one/releases/download/v1.0.0/app-debug.apk"
+    "https://github.com/Ankur-0211/NutriLens-Fit0one/releases/download/v1.0.0/nutrilens.apk"
 )
 
 router = APIRouter(tags=["Mobile Optimization & Manifests"])
