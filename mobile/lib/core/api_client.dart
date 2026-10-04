@@ -87,7 +87,7 @@ class NutriLensApiClient {
   Future<Map<String, dynamic>> analyzeImageBytes(List<int> imageBytes, {String filename = "meal.jpg"}) async {
     if (isOfflineMode) {
       lastUsedOffline = true;
-      return OfflineNutritionEngine.generateScanResult();
+      return OfflineNutritionEngine.generateScanResult(imageBytes: imageBytes);
     }
 
     try {
@@ -104,12 +104,12 @@ class NutriLensApiClient {
       } else {
         // Fallback gracefully on 5xx or server issues
         lastUsedOffline = true;
-        return OfflineNutritionEngine.generateScanResult();
+        return OfflineNutritionEngine.generateScanResult(imageBytes: imageBytes);
       }
     } catch (_) {
       // Laptop off or offline - use on-device autonomous AI
       lastUsedOffline = true;
-      return OfflineNutritionEngine.generateScanResult();
+      return OfflineNutritionEngine.generateScanResult(imageBytes: imageBytes);
     }
   }
 

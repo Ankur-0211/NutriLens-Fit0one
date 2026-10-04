@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/constants.dart';
 import '../../core/api_client.dart';
+import '../../core/user_profile.dart';
+import '../../core/update_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   final NutriLensApiClient apiClient;
@@ -13,9 +15,14 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int caloriesRemaining = 2500;
+  UserProfile profile = const UserProfile();
+  UpdateInfo? updateInfo;
+  bool isCheckingUpdate = false;
+  bool updateDismissed = false;
+
+  int caloriesRemaining = 2100;
   int caloriesIntake = 0;
-  int targetCalories = 2500;
+  int targetCalories = 2100;
   double proteinG = 0.0;
   double carbsG = 0.0;
   double fatG = 0.0;
@@ -26,27 +33,230 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _loadTelemetry();
+    _checkForLiveUpdates();
   }
 
   Future<void> _loadTelemetry() async {
     setState(() => isLoading = true);
     try {
+      profile = await UserProfileService.loadProfile();
+      targetCalories = profile.targetCalories;
+
       final now = DateTime.now().toIso8601String().split('T')[0];
       final data = await widget.apiClient.fetchDailyTelemetry(now);
       final totals = data['totals'] ?? {};
       final intake = ((totals['energy_kcal']?['value'] ?? 0) as num).round();
-      setState(() {
-        caloriesIntake = intake;
-        caloriesRemaining = (targetCalories - intake).clamp(0, targetCalories).toInt();
-        proteinG = ((totals['protein_g']?['value'] ?? 0.0) as num).toDouble();
-        carbsG = ((totals['carbs_g']?['value'] ?? 0.0) as num).toDouble();
-        fatG = ((totals['fat_g']?['value'] ?? 0.0) as num).toDouble();
-        isLoading = false;
-        currentMode = widget.apiClient.isOfflineMode || widget.apiClient.lastUsedOffline ? 'offline' : 'online';
-      });
+
+      if (mounted) {
+        setState(() {
+          caloriesIntake = intake;
+          caloriesRemaining = (targetCalories - intake).clamp(0, targetCalories).toInt();
+          proteinG = ((totals['protein_g']?['value'] ?? 0.0) as num).toDouble();
+          carbsG = ((totals['carbs_g']?['value'] ?? 0.0) as num).toDouble();
+          fatG = ((totals['fat_g']?['value'] ?? 0.0) as num).toDouble();
+          isLoading = false;
+          currentMode = widget.apiClient.isOfflineMode || widget.apiClient.lastUsedOffline ? 'offline' : 'online';
+        });
+      }
     } catch (_) {
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
+  }
+
+  Future<void> _checkForLiveUpdates({bool showSnackbarOnLatest = false}) async {
+    setState(() => isCheckingUpdate = true);
+    try {
+      final info = await LiveUpdateService.checkLatestRelease();
+      if (mounted) {
+        setState(() {
+          updateInfo = info;
+          isCheckingUpdate = false;
+        });
+
+        if (showSnackbarOnLatest) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                info.hasUpdate
+                    ? '🔥 Update ${info.latestVersion} available!'
+                    : '✅ You are on the latest version (${AppConstants.appVersionTag})',
+              ),
+              backgroundColor: info.hasUpdate ? AppConstants.primaryContainer : AppConstants.surfaceContainerHigh,
+            ),
+          );
+        }
+      }
+    } catch (_) {
+      if (mounted) setState(() => isCheckingUpdate = false);
+    }
+  }
+
+  void _showEditTargetsSheet() {
+    int tempCalories = targetCalories;
+    double tempProtein = profile.targetProteinG;
+    double tempCarbs = profile.targetCarbsG;
+    double tempFat = profile.targetFatG;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppConstants.surfaceContainer,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.tune, color: AppConstants.primaryContainer, size: 20),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'EDIT CALORIE & MACRO TARGETS',
+                            style: TextStyle(
+                              fontFamily: 'monospace',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: AppConstants.textOnSurface,
+                              letterSpacing: 1.1,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: AppConstants.outline, size: 20),
+                        onPressed: () => Navigator.pop(ctx),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Calorie Target
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'DAILY CALORIES',
+                        style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: AppConstants.outline, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '$tempCalories KCAL',
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: AppConstants.primaryContainer,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Slider(
+                    value: tempCalories.toDouble().clamp(1200.0, 4000.0),
+                    min: 1200.0,
+                    max: 4000.0,
+                    divisions: 56,
+                    activeColor: AppConstants.primaryContainer,
+                    inactiveColor: AppConstants.surfaceContainerHighest,
+                    onChanged: (val) {
+                      setSheetState(() {
+                        tempCalories = val.round();
+                        tempProtein = double.parse(((tempCalories * 0.25) / 4.0).toStringAsFixed(1));
+                        tempCarbs = double.parse(((tempCalories * 0.50) / 4.0).toStringAsFixed(1));
+                        tempFat = double.parse(((tempCalories * 0.25) / 9.0).toStringAsFixed(1));
+                      });
+                    },
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Macros
+                  _buildMacroAdjuster('PROTEIN (g)', tempProtein, 40, 250, AppConstants.primaryContainer, (v) {
+                    setSheetState(() => tempProtein = v);
+                  }),
+                  _buildMacroAdjuster('CARBS (g)', tempCarbs, 60, 450, AppConstants.secondary, (v) {
+                    setSheetState(() => tempCarbs = v);
+                  }),
+                  _buildMacroAdjuster('FATS (g)', tempFat, 20, 150, Colors.amberAccent, (v) {
+                    setSheetState(() => tempFat = v);
+                  }),
+
+                  const SizedBox(height: 18),
+
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      await UserProfileService.updateTargets(
+                        calories: tempCalories,
+                        protein: tempProtein,
+                        carbs: tempCarbs,
+                        fat: tempFat,
+                      );
+                      if (context.mounted) {
+                        Navigator.pop(ctx);
+                        _loadTelemetry();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Nutritional targets updated!'),
+                            backgroundColor: AppConstants.primaryContainer,
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.check, color: AppConstants.onPrimary, size: 18),
+                    label: const Text(
+                      'APPLY NEW TARGETS',
+                      style: TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold, fontSize: 12, color: AppConstants.onPrimary, letterSpacing: 1.1),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppConstants.primaryContainer,
+                      minimumSize: const Size.fromHeight(48),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildMacroAdjuster(String label, double val, double min, double max, Color color, ValueChanged<double> onChanged) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: const TextStyle(color: AppConstants.outline, fontSize: 10, fontFamily: 'monospace')),
+            Text('${val.round()}g', style: TextStyle(color: color, fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.bold)),
+          ],
+        ),
+        Slider(
+          value: val.clamp(min, max),
+          min: min,
+          max: max,
+          divisions: (max - min).toInt(),
+          activeColor: color,
+          inactiveColor: AppConstants.surfaceContainerHighest,
+          onChanged: (v) => onChanged(double.parse(v.toStringAsFixed(0))),
+        ),
+      ],
+    );
   }
 
   void _showServerConfigSheet() {
@@ -91,13 +301,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                           const SizedBox(width: 8),
                           const Text(
-                            'SERVER & CLOUD CONFIG',
+                            'SETTINGS & SERVER CONFIG',
                             style: TextStyle(
                               fontFamily: 'monospace',
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              fontSize: 13,
                               color: AppConstants.textOnSurface,
-                              letterSpacing: 1.2,
+                              letterSpacing: 1.1,
                             ),
                           ),
                         ],
@@ -113,14 +323,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     'Run NutriLens 24/7 without keeping your laptop on! Choose Offline Standalone mode or point to a free Cloud server.',
                     style: TextStyle(color: AppConstants.textVariant, fontSize: 12),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
 
                   // Quick Presets
-                  const Text(
-                    'QUICK PRESETS',
-                    style: TextStyle(color: AppConstants.outline, fontSize: 10, letterSpacing: 1.0, fontFamily: 'monospace'),
-                  ),
-                  const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -179,7 +384,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
+
+                  // Check Live Updates Button
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      Navigator.pop(ctx);
+                      _checkForLiveUpdates(showSnackbarOnLatest: true);
+                    },
+                    icon: const Icon(Icons.sync, size: 16),
+                    label: Text(
+                      'CHECK FOR LIVE UPDATES (${AppConstants.appVersionTag})',
+                      style: const TextStyle(fontFamily: 'monospace', fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppConstants.primaryContainer,
+                      side: BorderSide(color: AppConstants.primaryContainer.withOpacity(0.4)),
+                      minimumSize: const Size.fromHeight(42),
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
 
                   // URL Input
                   TextField(
@@ -196,7 +421,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Test Connection & Status
                   if (testStatus.isNotEmpty)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -206,21 +430,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: isSuccess ? AppConstants.primaryContainer.withOpacity(0.4) : AppConstants.error.withOpacity(0.4)),
                       ),
-                      child: Row(
-                        children: [
-                          Icon(isSuccess ? Icons.check_circle : Icons.error_outline, color: isSuccess ? AppConstants.primaryContainer : AppConstants.error, size: 16),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              testStatus,
-                              style: TextStyle(
-                                color: isSuccess ? AppConstants.primaryContainer : AppConstants.error,
-                                fontSize: 11,
-                                fontFamily: 'monospace',
-                              ),
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        testStatus,
+                        style: TextStyle(
+                          color: isSuccess ? AppConstants.primaryContainer : AppConstants.error,
+                          fontSize: 11,
+                          fontFamily: 'monospace',
+                        ),
                       ),
                     ),
 
@@ -255,7 +471,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Expanded(
                         child: ElevatedButton.icon(
                           icon: const Icon(Icons.save, size: 18, color: AppConstants.onPrimary),
-                          label: const Text('APPLY & SAVE', style: TextStyle(color: AppConstants.onPrimary, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.0)),
+                          label: const Text('APPLY & SAVE', style: TextStyle(color: AppConstants.onPrimary, fontWeight: FontWeight.bold, fontSize: 12)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppConstants.primaryContainer,
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -290,15 +506,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     IconData badgeIcon;
 
     if (isOffline) {
-      badgeColor = const Color(0xFFC084FC); // Purple / Offline Autonomous
+      badgeColor = const Color(0xFFC084FC);
       badgeText = 'ON-DEVICE AI';
       badgeIcon = Icons.offline_bolt;
     } else if (isCloud) {
-      badgeColor = AppConstants.primaryContainer; // Green / Cloud 24/7
+      badgeColor = AppConstants.primaryContainer;
       badgeText = 'CLOUD 24/7';
       badgeIcon = Icons.cloud_done;
     } else {
-      badgeColor = AppConstants.secondary; // Orange / Local Wi-Fi
+      badgeColor = AppConstants.secondary;
       badgeText = 'LOCAL WI-FI';
       badgeIcon = Icons.wifi;
     }
@@ -345,14 +561,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            const Text(
-              'BIO-TELEMETRY',
-              style: TextStyle(
+            Text(
+              'BIO-TELEMETRY // ${profile.name.toUpperCase()}',
+              style: const TextStyle(
                 fontFamily: 'monospace',
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.bold,
                 color: AppConstants.textOnSurface,
-                letterSpacing: 1.2,
+                letterSpacing: 1.1,
               ),
             ),
           ],
@@ -374,35 +590,79 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Offline Standalone Banner if applicable
-              if (widget.apiClient.isOfflineMode || widget.apiClient.lastUsedOffline)
+              // Live Update Banner if newer version is released on GitHub
+              if (updateInfo != null && updateInfo!.hasUpdate && !updateDismissed)
                 Container(
-                  margin: const EdgeInsets.only(bottom: 12.0),
-                  padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+                  margin: const EdgeInsets.only(bottom: 14.0),
+                  padding: const EdgeInsets.all(14.0),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFC084FC).withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFC084FC).withOpacity(0.35)),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF2E1065), Color(0xFF1E1B4B)],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFA855F7).withOpacity(0.5)),
                   ),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.bolt, color: Color(0xFFC084FC), size: 18),
-                      const SizedBox(width: 8),
-                      const Expanded(
-                        child: Text(
-                          'Standalone Phone Mode: Operating 100% locally with on-device Indian food engine. Laptop can remain OFF.',
-                          style: TextStyle(color: AppConstants.textOnSurface, fontSize: 11),
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.upgrade, color: Color(0xFFC084FC), size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                'UPDATE AVAILABLE: ${updateInfo!.latestVersion}',
+                                style: const TextStyle(
+                                  color: Color(0xFFE9D5FF),
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'monospace',
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: AppConstants.outline, size: 16),
+                            onPressed: () => setState(() => updateDismissed = true),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
                       ),
-                      TextButton(
-                        onPressed: _showServerConfigSheet,
-                        child: const Text('CONFIG', style: TextStyle(color: Color(0xFFC084FC), fontSize: 10, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'A newer release of NutriLens with enhancements is available for download.',
+                        style: TextStyle(color: Color(0xFFDDD6FE), fontSize: 11),
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          // Copy direct download link to clipboard and inform user
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Download URL: ${updateInfo!.downloadUrl}'),
+                              backgroundColor: AppConstants.primaryContainer,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.download, size: 16, color: Colors.white),
+                        label: const Text(
+                          'DOWNLOAD UPDATE APK',
+                          style: TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold, fontSize: 11, color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF9333EA),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
                       ),
                     ],
                   ),
                 ),
 
-              // Caloric Flux Dual-Arc HUD Card
+              // Caloric Flux Dual-Arc HUD Card with Target Edit Button
               Container(
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
@@ -425,18 +685,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             letterSpacing: 1.0,
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppConstants.surfaceContainerHigh,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            'TARGET: 2500 KCAL',
-                            style: TextStyle(
-                              fontFamily: 'monospace',
-                              fontSize: 10,
-                              color: AppConstants.textVariant,
+                        GestureDetector(
+                          onTap: _showEditTargetsSheet,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppConstants.primaryContainer.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: AppConstants.primaryContainer.withOpacity(0.4)),
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'TARGET: $targetCalories KCAL',
+                                  style: const TextStyle(
+                                    fontFamily: 'monospace',
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppConstants.primaryContainer,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(Icons.edit, size: 11, color: AppConstants.primaryContainer),
+                              ],
                             ),
                           ),
                         ),
@@ -474,7 +745,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       children: [
                         _buildStatColumn('INTAKE', '$caloriesIntake', AppConstants.textOnSurface),
                         Container(width: 1, height: 30, color: AppConstants.surfaceContainerHigh),
-                        _buildStatColumn('BURN', '450', AppConstants.secondary),
+                        _buildStatColumn('TARGET', '$targetCalories', AppConstants.secondary),
                         Container(width: 1, height: 30, color: AppConstants.surfaceContainerHigh),
                         _buildStatColumn('REMAINING', '$caloriesRemaining', AppConstants.primaryContainer),
                       ],
@@ -485,7 +756,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               const SizedBox(height: 16),
 
-              // Macro Nutrient Telemetry Card
+              // Macro Nutrient Telemetry Card (Dynamic Targets)
               Container(
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
@@ -496,22 +767,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'MACRO-NUTRIENT MATRIX',
-                      style: TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppConstants.outline,
-                        letterSpacing: 1.0,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'MACRO-NUTRIENT MATRIX',
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppConstants.outline,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: AppConstants.outline, size: 14),
+                          onPressed: _showEditTargetsSheet,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    _buildMacroMeter('PROTEIN', proteinG, 140.0, AppConstants.primaryContainer),
+                    const SizedBox(height: 14),
+                    _buildMacroMeter('PROTEIN', proteinG, profile.targetProteinG, AppConstants.primaryContainer),
                     const SizedBox(height: 12),
-                    _buildMacroMeter('CARBOHYDRATES', carbsG, 280.0, AppConstants.secondary),
+                    _buildMacroMeter('CARBOHYDRATES', carbsG, profile.targetCarbsG, AppConstants.secondary),
                     const SizedBox(height: 12),
-                    _buildMacroMeter('FAT', fatG, 65.0, Colors.amberAccent),
+                    _buildMacroMeter('FAT', fatG, profile.targetFatG, Colors.amberAccent),
                   ],
                 ),
               ),
@@ -548,7 +830,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildStatColumn(String label, String value, Color color) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(color: AppConstants.outline, fontSize: 10, letterSpacing: 1.0)),
+        Text(label, style: const TextStyle(color: AppConstants.outline, fontSize: 10, letterSpacing: 1.0, fontFamily: 'monospace')),
         const SizedBox(height: 4),
         Text(value, style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'monospace')),
       ],
@@ -556,7 +838,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildMacroMeter(String name, double current, double target, Color barColor) {
-    final pct = (current / target).clamp(0.0, 1.0);
+    final t = target > 0 ? target : 100.0;
+    final pct = (current / t).clamp(0.0, 1.0);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -564,7 +847,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(name, style: const TextStyle(color: AppConstants.textOnSurface, fontSize: 11, fontFamily: 'monospace')),
-            Text('${current.toStringAsFixed(1)} / ${target.toStringAsFixed(0)}g', style: TextStyle(color: barColor, fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.bold)),
+            Text('${current.toStringAsFixed(1)} / ${t.toStringAsFixed(0)}g', style: TextStyle(color: barColor, fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.bold)),
           ],
         ),
         const SizedBox(height: 6),

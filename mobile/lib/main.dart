@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'core/constants.dart';
 import 'core/api_client.dart';
+import 'core/user_profile.dart';
+import 'features/onboarding/onboarding_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
 import 'features/scanner/scanner_screen.dart';
 import 'features/diary/diary_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const NutriLensApp());
 }
 
@@ -27,8 +30,62 @@ class NutriLensApp extends StatelessWidget {
           error: AppConstants.error,
         ),
       ),
-      home: const MainNavigationShell(),
+      home: const RootAppShell(),
     );
+  }
+}
+
+class RootAppShell extends StatefulWidget {
+  const RootAppShell({Key? key}) : super(key: key);
+
+  @override
+  State<RootAppShell> createState() => _RootAppShellState();
+}
+
+class _RootAppShellState extends State<RootAppShell> {
+  bool _isLoading = true;
+  bool _hasCompletedOnboarding = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkOnboardingStatus();
+  }
+
+  Future<void> _checkOnboardingStatus() async {
+    try {
+      final profile = await UserProfileService.loadProfile();
+      if (mounted) {
+        setState(() {
+          _hasCompletedOnboarding = profile.hasCompletedOnboarding;
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: AppConstants.surface,
+        body: Center(
+          child: CircularProgressIndicator(color: AppConstants.primaryContainer),
+        ),
+      );
+    }
+
+    if (!_hasCompletedOnboarding) {
+      return OnboardingScreen(
+        onSetupCompleted: () {
+          setState(() => _hasCompletedOnboarding = true);
+        },
+      );
+    }
+
+    return const MainNavigationShell();
   }
 }
 

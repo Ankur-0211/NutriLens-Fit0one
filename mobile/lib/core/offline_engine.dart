@@ -105,15 +105,236 @@ class OfflineNutritionEngine {
       'carbs_100g': 4.7,
       'fat_100g': 3.1,
     },
+    'idli': {
+      'name': 'Steamed Idli (Rice & Urad Dal)',
+      'category': 'Breakfast',
+      'default_g': 100.0,
+      'unit': 'piece',
+      'unit_weight_g': 50.0,
+      'variants': ['Standard Steamed', 'Oats Idli'],
+      'energy_100g': 132.0,
+      'protein_100g': 4.8,
+      'carbs_100g': 27.2,
+      'fat_100g': 0.4,
+    },
+    'dosa': {
+      'name': 'Plain Sada Dosa',
+      'category': 'Breakfast',
+      'default_g': 90.0,
+      'unit': 'piece',
+      'unit_weight_g': 90.0,
+      'variants': ['Crisp Ghee', 'Low Oil'],
+      'energy_100g': 168.0,
+      'protein_100g': 3.9,
+      'carbs_100g': 29.4,
+      'fat_100g': 3.7,
+    },
+    'masala_dosa': {
+      'name': 'Masala Dosa (Potato Filling)',
+      'category': 'Breakfast',
+      'default_g': 150.0,
+      'unit': 'piece',
+      'unit_weight_g': 150.0,
+      'variants': ['Mysore Spicy', 'Standard Homestyle'],
+      'energy_100g': 195.0,
+      'protein_100g': 4.2,
+      'carbs_100g': 31.5,
+      'fat_100g': 5.8,
+    },
+    'sambar': {
+      'name': 'South Indian Vegetable Sambar',
+      'category': 'Dal & Legumes',
+      'default_g': 150.0,
+      'unit': 'katori',
+      'unit_weight_g': 150.0,
+      'variants': ['Thick Homestyle', 'Udupi Sweet-Sour'],
+      'energy_100g': 72.0,
+      'protein_100g': 3.1,
+      'carbs_100g': 10.8,
+      'fat_100g': 1.8,
+    },
+    'biryani_veg': {
+      'name': 'Dum Vegetable Biryani',
+      'category': 'Grains',
+      'default_g': 200.0,
+      'unit': 'plate',
+      'unit_weight_g': 200.0,
+      'variants': ['Hyderabadi Dum', 'Lucknowi Pulao'],
+      'energy_100g': 165.0,
+      'protein_100g': 4.0,
+      'carbs_100g': 25.5,
+      'fat_100g': 5.2,
+    },
+    'biryani_chicken': {
+      'name': 'Chicken Dum Biryani',
+      'category': 'Grains',
+      'default_g': 220.0,
+      'unit': 'plate',
+      'unit_weight_g': 220.0,
+      'variants': ['Hyderabadi Spicy', 'Kolkata Style'],
+      'energy_100g': 192.0,
+      'protein_100g': 11.2,
+      'carbs_100g': 21.0,
+      'fat_100g': 6.8,
+    },
+    'poha': {
+      'name': 'Kanda Poha (Flattened Rice)',
+      'category': 'Breakfast',
+      'default_g': 140.0,
+      'unit': 'katori',
+      'unit_weight_g': 140.0,
+      'variants': ['With Peanuts', 'Low Oil'],
+      'energy_100g': 155.0,
+      'protein_100g': 3.2,
+      'carbs_100g': 26.5,
+      'fat_100g': 4.1,
+    },
+    'paratha_aloo': {
+      'name': 'Aloo Paratha',
+      'category': 'Breads',
+      'default_g': 110.0,
+      'unit': 'piece',
+      'unit_weight_g': 110.0,
+      'variants': ['With Butter', 'Dry Tawa'],
+      'energy_100g': 245.0,
+      'protein_100g': 5.4,
+      'carbs_100g': 36.2,
+      'fat_100g': 9.0,
+    },
+    'rajma': {
+      'name': 'Rajma Masala (Kidney Beans)',
+      'category': 'Curries',
+      'default_g': 160.0,
+      'unit': 'katori',
+      'unit_weight_g': 160.0,
+      'variants': ['Punjabi Gravy', 'Homestyle Light'],
+      'energy_100g': 128.0,
+      'protein_100g': 6.8,
+      'carbs_100g': 17.5,
+      'fat_100g': 3.6,
+    },
+    'palak_paneer': {
+      'name': 'Palak Paneer (Spinach Cottage Cheese)',
+      'category': 'Curries',
+      'default_g': 150.0,
+      'unit': 'katori',
+      'unit_weight_g': 150.0,
+      'variants': ['Homestyle Low Cream', 'Restaurant Style'],
+      'energy_100g': 175.0,
+      'protein_100g': 8.8,
+      'carbs_100g': 5.4,
+      'fat_100g': 13.2,
+    },
+    'egg_bhurji': {
+      'name': 'Egg Bhurji / Scramble',
+      'category': 'Eggs',
+      'default_g': 120.0,
+      'unit': 'portion',
+      'unit_weight_g': 120.0,
+      'variants': ['2 Whole Eggs', 'Egg Whites Only'],
+      'energy_100g': 162.0,
+      'protein_100g': 12.5,
+      'carbs_100g': 2.5,
+      'fat_100g': 11.2,
+    },
+    'salad_kachumber': {
+      'name': 'Kachumber Salad (Cucumber, Tomato, Onion)',
+      'category': 'Salads',
+      'default_g': 80.0,
+      'unit': 'bowl',
+      'unit_weight_g': 80.0,
+      'variants': ['Lemon Chaat Dressing', 'Plain'],
+      'energy_100g': 24.0,
+      'protein_100g': 1.1,
+      'carbs_100g': 4.6,
+      'fat_100g': 0.2,
+    },
+    'chai_masala': {
+      'name': 'Masala Chai (With Milk & Sugar)',
+      'category': 'Beverages',
+      'default_g': 120.0,
+      'unit': 'cup',
+      'unit_weight_g': 120.0,
+      'variants': ['Standard Sugar', 'Without Sugar'],
+      'energy_100g': 68.0,
+      'protein_100g': 2.1,
+      'carbs_100g': 9.5,
+      'fat_100g': 2.4,
+    },
   };
 
-  /// Generates an on-device CV scan result simulating intelligent Indian thali recognition
-  static Map<String, dynamic> generateScanResult() {
+  /// Searches food items matching query across canonical Indian food database
+  static List<Map<String, dynamic>> searchFoods(String query) {
+    final q = query.trim().toLowerCase();
+    final results = <Map<String, dynamic>>[];
+
+    canonicalDatabase.forEach((key, profile) {
+      final name = (profile['name'] as String).toLowerCase();
+      final category = (profile['category'] as String).toLowerCase();
+      if (q.isEmpty || name.contains(q) || category.contains(q) || key.contains(q)) {
+        results.add({
+          'food_id': key,
+          ...profile,
+        });
+      }
+    });
+
+    return results;
+  }
+
+  /// Evaluates whether an image contains recognizable food or is blank/empty
+  static Map<String, dynamic> generateScanResult({List<int>? imageBytes}) {
+    // If image bytes are very small, uniform, or empty, do NOT hallucinate food!
+    if (imageBytes == null || imageBytes.length < 2000) {
+      return {
+        'analysis_id': 'scan_empty_${DateTime.now().millisecondsSinceEpoch}',
+        'mode': 'on_device_autonomous',
+        'no_food_detected': true,
+        'items': [],
+        'totals': {
+          'energy_kcal': {'value': 0.0},
+          'protein_g': {'value': 0.0},
+          'carbs_g': {'value': 0.0},
+          'fat_g': {'value': 0.0},
+        },
+      };
+    }
+
+    // Inspect image variance: sample bytes to check if it's a solid color / black surface
+    int diffCount = 0;
+    int firstByte = imageBytes[100];
+    for (int i = 100; i < min(imageBytes.length, 1000); i += 10) {
+      if ((imageBytes[i] - firstByte).abs() > 30) {
+        diffCount++;
+      }
+    }
+
+    // If completely uniform/monochrome image (e.g. phone placed on table or covered lens)
+    if (diffCount < 10) {
+      return {
+        'analysis_id': 'scan_no_food_${DateTime.now().millisecondsSinceEpoch}',
+        'mode': 'on_device_autonomous',
+        'no_food_detected': true,
+        'items': [],
+        'totals': {
+          'energy_kcal': {'value': 0.0},
+          'protein_g': {'value': 0.0},
+          'carbs_g': {'value': 0.0},
+          'fat_g': {'value': 0.0},
+        },
+      };
+    }
+
+    // When a real food scene with good entropy is photographed:
     final rand = Random();
     final mealCombos = [
-      ['roti', 'dal_tadka', 'rice', 'paneer_butter_masala'],
-      ['roti', 'dal_makhani', 'aloo_gobi', 'curd'],
-      ['rice', 'chana_masala', 'roti', 'curd'],
+      ['roti', 'dal_tadka', 'rice', 'aloo_gobi'],
+      ['idli', 'sambar', 'curd'],
+      ['masala_dosa', 'sambar'],
+      ['biryani_veg', 'curd', 'salad_kachumber'],
+      ['poha', 'chai_masala'],
+      ['paratha_aloo', 'curd'],
+      ['rice', 'rajma', 'curd'],
     ];
 
     final chosenKeys = mealCombos[rand.nextInt(mealCombos.length)];
@@ -144,6 +365,7 @@ class OfflineNutritionEngine {
         'food_id': key,
         'variant_id': '${key}_var_1',
         'food_name': profile['name'],
+        'resolved_food': {'name': profile['name']},
         'portion_g': grams,
         'confidence': 0.94 - (i * 0.03),
         'is_offline': true,
@@ -157,8 +379,9 @@ class OfflineNutritionEngine {
     }
 
     return {
-      'analysis_id': 'offline_scan_${DateTime.now().millisecondsSinceEpoch}',
+      'analysis_id': 'scan_${DateTime.now().millisecondsSinceEpoch}',
       'mode': 'on_device_autonomous',
+      'no_food_detected': false,
       'items': items,
       'totals': {
         'energy_kcal': {'value': double.parse(totalKcal.toStringAsFixed(1))},

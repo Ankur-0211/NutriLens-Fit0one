@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 
 class AppConstants {
+  // App Version & Update Information
+  static const String appVersion = "1.0.0";
+  static const String appVersionTag = "v1.0.0";
+  static const String githubRepo = "Ankur-0211/NutriLens-Fit0one";
+  static const String releasesApiUrl = "https://api.github.com/repos/Ankur-0211/NutriLens-Fit0one/releases/latest";
+  static const String fallbackApkUrl = "https://github.com/Ankur-0211/NutriLens-Fit0one/releases/download/v1.0.0/nutrilens.apk";
+
   // Network API Base URL
-  static const String defaultApiBaseUrl = "http://10.0.2.2:8000/v1"; // Android emulator -> host
+  static const String defaultApiBaseUrl = "http://10.0.89.21:8000/v1"; // Wi-Fi host IP
   static const String iosApiBaseUrl = "http://127.0.0.1:8000/v1";
 
   // Cyber-Kinetic Color Palette (matching stitch_calorie_counter_app_interface tokens)
